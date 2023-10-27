@@ -751,18 +751,22 @@
         "properties": {
           "accounts": {
             "items": {
-              "items": [
-                {
-                  "items": [
-                    { "$ref": "#/components/schemas/Party" },
-                    { "$ref": "#/components/schemas/Token" }
-                  ],
-                  "maxItems": 2,
-                  "minItems": 2,
-                  "type": "array"
-                },
-                { "type": "integer" }
-              ],
+              "items": {
+                "oneOf": [
+                  {
+                    "items": {
+                      "oneOf": [
+                        { "$ref": "#/components/schemas/Party" },
+                        { "$ref": "#/components/schemas/Token" }
+                      ]
+                    },
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  { "type": "integer" }
+                ]
+              },
               "maxItems": 2,
               "minItems": 2,
               "type": "array"
@@ -771,7 +775,9 @@
           },
           "boundValues": {
             "items": {
-              "items": [{ "type": "string" }, { "type": "integer" }],
+              "items": {
+                "oneOf": [{ "type": "string" }, { "type": "integer" }]
+              },
               "maxItems": 2,
               "minItems": 2,
               "type": "array"
@@ -780,10 +786,12 @@
           },
           "choices": {
             "items": {
-              "items": [
-                { "$ref": "#/components/schemas/ChoiceId" },
-                { "type": "integer" }
-              ],
+              "items": {
+                "oneOf": [
+                  { "$ref": "#/components/schemas/ChoiceId" },
+                  { "type": "integer" }
+                ]
+              },
               "maxItems": 2,
               "minItems": 2,
               "type": "array"
@@ -1162,11 +1170,7 @@
             "description": "A Plutus staking pointer.",
             "properties": {
               "stakingHash": {
-                "items": [
-                  { "type": "integer" },
-                  { "type": "integer" },
-                  { "type": "integer" }
-                ],
+                "items": { "type": "integer" },
                 "maxItems": 3,
                 "minItems": 3,
                 "type": "array"
