@@ -17,7 +17,7 @@
     "sdk",
     "typescript"
   ],
-  "author": "Nicolás Ludueña <luduena.nicolas.victorio@gmail.com>",
+  "author": "Nicolás Ludueña <nicolas.luduena@txpipe.io>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/txpipe-shop/marlowe-typescript-sdk/issues"
