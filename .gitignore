@@ -1,3 +1,4 @@
 openapitools.json
 node_modules
 dist
+.openapi-generator
