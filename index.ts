@@ -1,3 +1,1 @@
-/* tslint:disable */
-/* eslint-disable */
-export * from "./generated";
+export * from "marlowe-typescript-sdk";
