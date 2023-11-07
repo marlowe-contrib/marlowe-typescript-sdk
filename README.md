@@ -1,5 +1,6 @@
 # marlowe-typescript-sdk
 
-```sh
-openapi-generator-cli generate -i openapi.json -g typescript-axios --skip-validate-spec -o generated --additional-properties=npmName=marlowe-typescript-sdk,disallowAdditionalPropertiesIfNotPresent=false,enumPropertyNamingReplaceSpecialChar=true,npmRepository=https://github.com/txpipe-shop/marlowe-typescript-sdk,nullSafeAdditionalProps=true,snapshot=true,useSingleRequestParameter=true
-```
+## SDK structure
+
+- Base interactions with API defined in the `marlowe-typescript-axios` package, i.e., the `/generated` directory.
+- SDK will be defined in the root folder using the interactions from the `/generated`.
