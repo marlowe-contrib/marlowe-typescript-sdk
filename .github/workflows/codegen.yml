@@ -31,7 +31,7 @@ jobs:
         run: rm -rf $OUTPUT_GEN_DIR
 
       - name: Generate typescript code from specs
-        run: npx @openapitools/openapi-generator-cli generate -i openapi.json -g typescript-axios --skip-validate-spec -o $OUTPUT_GEN_DIR --additional-properties=npmName=marlowe-typescript-sdk,disallowAdditionalPropertiesIfNotPresent=false,enumPropertyNamingReplaceSpecialChar=true,npmRepository=https://github.com/txpipe-shop/marlowe-typescript-sdk,nullSafeAdditionalProps=true,snapshot=true,useSingleRequestParameter=true
+        run: npx @openapitools/openapi-generator-cli generate -i openapi.json -g typescript-axios -o $OUTPUT_GEN_DIR --additional-properties=npmName=marlowe-typescript-generated,disallowAdditionalPropertiesIfNotPresent=false,enumPropertyNamingReplaceSpecialChar=true,npmRepository=https://github.com/txpipe-shop/marlowe-typescript-sdk,nullSafeAdditionalProps=true,snapshot=true,useSingleRequestParameter=true
 
       - name: Commit changes
         uses: EndBug/add-and-commit@v9

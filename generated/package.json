@@ -1,7 +1,7 @@
 {
-  "name": "marlowe-typescript-axios",
-  "version": "0.0.5.1-SNAPSHOT.202311031304",
-  "description": "OpenAPI client for marlowe-typescript-axios",
+  "name": "marlowe-typescript-generated",
+  "version": "0.0.5.1-SNAPSHOT.202311071803",
+  "description": "OpenAPI client for marlowe-typescript-generated",
   "author": "OpenAPI-Generator Contributors",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
     "typescript",
     "openapi-client",
     "openapi-generator",
-    "marlowe-typescript-axios"
+    "marlowe-typescript-generated"
   ],
   "license": "Unlicense",
   "main": "./dist/index.js",
