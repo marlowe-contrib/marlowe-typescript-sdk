@@ -4,7 +4,6 @@
   "description": "Typescript SDK for the Marlowe Runtime REST API",
   "main": "index.ts",
   "scripts": {
-    "gen": "openapi-generator-cli generate -i openapi.json -g typescript-axios --skip-validate-spec -o generated --additional-properties=npmName=marlowe-typescript-sdk,disallowAdditionalPropertiesIfNotPresent=false,enumPropertyNamingReplaceSpecialChar=true,npmRepository=https://github.com/txpipe-shop/marlowe-typescript-sdk,nullSafeAdditionalProps=true,snapshot=true,useSingleRequestParameter=true",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,12 +23,11 @@
   },
   "homepage": "https://github.com/txpipe-shop/marlowe-typescript-sdk#readme",
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.7.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "axios": "^1.6.0",
-    "marlowe-typescript-sdk": "file:generated"
+    "marlowe-typescript-axios": "file:generated"
   }
 }

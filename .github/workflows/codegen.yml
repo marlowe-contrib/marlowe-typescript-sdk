@@ -1,0 +1,37 @@
+name: Automatically create typescript code to interact with the API
+on: push
+
+env:
+  FILE_PATH: openapi.json
+  OUTPUT_GEN_DIR: generated
+
+jobs:
+  run:
+    name: Generate code typescript to interact with the API described in openapi.json
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set file path
+        run: echo "FILE_PATH=openapi.json" >> "$GITHUB_ENV"
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 5
+
+      - name: Check if running the action is needed.
+        run: echo "API_SPECS_CHANGED=$(git diff --name-only HEAD HEAD~1 | grep $FILE_PATH)" >> "$GITHUB_ENV"
+
+      - name: Show variables
+        run: echo "HI $API_SPECS_CHANGED $FILE_PATH"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+
+      - name: Remove previously generated code
+        run: rm -rf $OUTPUT_GEN_DIR
+
+      - name: Generate typescript code from specs
+        run: npx @openapitools/openapi-generator-cli generate -i openapi.json -g typescript-axios --skip-validate-spec -o $OUTPUT_GEN_DIR --additional-properties=npmName=marlowe-typescript-sdk,disallowAdditionalPropertiesIfNotPresent=false,enumPropertyNamingReplaceSpecialChar=true,npmRepository=https://github.com/txpipe-shop/marlowe-typescript-sdk,nullSafeAdditionalProps=true,snapshot=true,useSingleRequestParameter=true
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
