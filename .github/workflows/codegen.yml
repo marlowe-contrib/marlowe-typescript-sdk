@@ -1,5 +1,9 @@
-name: Automatically create typescript code to interact with the API
+name: Typescript code from specs
 on: push
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   FILE_PATH: openapi.json
@@ -7,7 +11,7 @@ env:
 
 jobs:
   run:
-    name: Generate code typescript to interact with the API described in openapi.json
+    name: Typescript code from specs in openapi.json
     runs-on: ubuntu-latest
     steps:
       - name: Set file path
