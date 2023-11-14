@@ -1,5 +1,8 @@
 name: Typescript code from specs
-on: push
+on: 
+  push:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -29,13 +32,24 @@ jobs:
         run: echo "HI $API_SPECS_CHANGED $FILE_PATH"
 
       - name: Set up Node.js
+        if: ENV.API_SPECS_CHANGED
         uses: actions/setup-node@v3
 
       - name: Remove previously generated code
+        if: ENV.API_SPECS_CHANGED
         run: rm -rf $OUTPUT_GEN_DIR
 
       - name: Generate typescript code from specs
+        if: ENV.API_SPECS_CHANGED
         run: npx @openapitools/openapi-generator-cli generate -i $FILE_PATH -g typescript-axios -o $OUTPUT_GEN_DIR --additional-properties=npmName=marlowe-typescript-generated,disallowAdditionalPropertiesIfNotPresent=false,enumPropertyNamingReplaceSpecialChar=true,npmRepository=https://github.com/txpipe-shop/marlowe-typescript-sdk,nullSafeAdditionalProps=true,useSingleRequestParameter=true
 
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v9
+      - name: Create pull request
+        if: ENV.API_SPECS_CHANGED
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: feat(MarloweAPIClient):api client update
+          title: Update MarloweAPIClient to match OpenAPI specs
+          body: |
+            This PR updates the MarloweAPIClient project based on the specs described in `openapi.json`
+
+          branch: api-client-codegen
