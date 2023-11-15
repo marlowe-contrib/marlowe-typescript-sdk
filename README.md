@@ -16,4 +16,4 @@ npx @openapitools/openapi-generator-cli validate -i openapi.json
 
 - Base interactions with API defined in the `marlowe-typescript-generated` package, i.e., the `/generated` directory. These interactions are generated automatically according to the file `openapi.json`
 
-- SDK will be defined from the root directory using the interactions from `marlowe-typescript-axios`.
+- SDK will be defined from the root directory using the interactions from `marlowe-typescript-generated`.
