@@ -149,19 +149,15 @@
         "type": "object"
       },
       "ApplyInputsTxEnvelope": {
-        "description": "The \"type\" property of \"tx\" must be \"Tx BabbageEra\" or \"Tx ConwayEra\"",
         "properties": {
-          "contractId": {
-            "$ref": "#/components/schemas/TxOutRef"
-          },
-          "transactionId": {
-            "$ref": "#/components/schemas/TxId"
-          },
           "tx": {
             "$ref": "#/components/schemas/TextEnvelope"
+          },
+          "withdrawalId": {
+            "$ref": "#/components/schemas/TxId"
           }
         },
-        "required": ["contractId", "transactionId", "tx"],
+        "required": ["withdrawalId", "tx"],
         "type": "object"
       },
       "AssetId": {
@@ -201,13 +197,13 @@
           },
           "blockNo": {
             "format": "int64",
-            "maximum": 18446744073709551615,
+            "maximum": 9223372036854775807,
             "minimum": 0,
             "type": "integer"
           },
           "slotNo": {
             "format": "int64",
-            "maximum": 18446744073709551615,
+            "maximum": 9223372036854775807,
             "minimum": 0,
             "type": "integer"
           }
@@ -734,48 +730,10 @@
             "type": "object"
           },
           "resource": {
-            "$ref": "#/components/schemas/CreateTxEnvelope"
+            "$ref": "#/components/schemas/ApplyInputsTxEnvelope"
           }
         },
         "required": ["resource", "links"],
-        "type": "object"
-      },
-      "CreateTxBodyEnvelope": {
-        "description": "The \"type\" property of \"txBody\" must be \"TxBody BabbageEra\" or \"TxBody ConwayEra\"",
-        "properties": {
-          "contractId": {
-            "$ref": "#/components/schemas/TxOutRef"
-          },
-          "safetyErrors": {
-            "items": {
-              "$ref": "#/components/schemas/SafetyError"
-            },
-            "type": "array"
-          },
-          "txBody": {
-            "$ref": "#/components/schemas/TextEnvelope"
-          }
-        },
-        "required": ["contractId", "txBody"],
-        "type": "object"
-      },
-      "CreateTxEnvelope": {
-        "description": "The \"type\" property of \"tx\" must be \"Tx BabbageEra\" or \"Tx ConwayEra\"",
-        "properties": {
-          "contractId": {
-            "$ref": "#/components/schemas/TxOutRef"
-          },
-          "safetyErrors": {
-            "items": {
-              "$ref": "#/components/schemas/SafetyError"
-            },
-            "type": "array"
-          },
-          "tx": {
-            "$ref": "#/components/schemas/TextEnvelope"
-          }
-        },
-        "required": ["contractId", "tx"],
         "type": "object"
       },
       "ExBudget": {
@@ -818,10 +776,7 @@
               "properties": {
                 "links": {
                   "properties": {
-                    "contract": {
-                      "type": "string"
-                    },
-                    "transactions": {
+                    "payout": {
                       "type": "string"
                     }
                   },
@@ -863,32 +818,6 @@
         "required": ["resource", "links"],
         "type": "object"
       },
-      "GetPayoutsResponse": {
-        "properties": {
-          "results": {
-            "items": {
-              "properties": {
-                "links": {
-                  "properties": {
-                    "payout": {
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                },
-                "resource": {
-                  "$ref": "#/components/schemas/PayoutHeader"
-                }
-              },
-              "required": ["resource", "links"],
-              "type": "object"
-            },
-            "type": "array"
-          }
-        },
-        "required": ["results"],
-        "type": "object"
-      },
       "GetTransactionResponse": {
         "properties": {
           "links": {
@@ -907,58 +836,6 @@
           }
         },
         "required": ["resource", "links"],
-        "type": "object"
-      },
-      "GetTransactionsResponse": {
-        "properties": {
-          "results": {
-            "items": {
-              "properties": {
-                "links": {
-                  "properties": {
-                    "transaction": {
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                },
-                "resource": {
-                  "$ref": "#/components/schemas/TxHeader"
-                }
-              },
-              "required": ["resource", "links"],
-              "type": "object"
-            },
-            "type": "array"
-          }
-        },
-        "required": ["results"],
-        "type": "object"
-      },
-      "GetWithdrawalsResponse": {
-        "properties": {
-          "results": {
-            "items": {
-              "properties": {
-                "links": {
-                  "properties": {
-                    "withdrawal": {
-                      "type": "string"
-                    }
-                  },
-                  "type": "object"
-                },
-                "resource": {
-                  "$ref": "#/components/schemas/WithdrawalHeader"
-                }
-              },
-              "required": ["resource", "links"],
-              "type": "object"
-            },
-            "type": "array"
-          }
-        },
-        "required": ["results"],
         "type": "object"
       },
       "Input": {
@@ -1833,7 +1710,13 @@
             "$ref": "#/components/schemas/MarloweVersion"
           }
         },
-        "required": ["tags", "metadata", "version", "contract"],
+        "required": [
+          "tags",
+          "metadata",
+          "version",
+          "contract",
+          "minUTxODeposit"
+        ],
         "type": "object"
       },
       "PostTransactionsRequest": {
@@ -1897,20 +1780,6 @@
               }
             },
             "required": ["address", "metadata"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "metadata": {
-                "$ref": "#/components/schemas/TokenMetadata"
-              },
-              "script": {
-                "description": "The type of script receiving the role token.",
-                "enum": ["ThreadRole", "OpenRole"],
-                "type": "string"
-              }
-            },
-            "required": ["script"],
             "type": "object"
           }
         ]
@@ -1996,7 +1865,6 @@
             "type": "string"
           },
           "type": {
-            "description": "What type of data is encoded in the CBOR Hex. Valid values include \"Tx <era>\", \"TxBody <era>\", and \"ShelleyTxWitness <era>\" where <era> is one of \"BabbageEra\", \"ConwayEra\".",
             "type": "string"
           }
         },
@@ -2684,36 +2552,10 @@
             "type": "object"
           },
           "resource": {
-            "$ref": "#/components/schemas/WithdrawTxEnvelope"
+            "$ref": "#/components/schemas/ApplyInputsTxEnvelope"
           }
         },
         "required": ["resource", "links"],
-        "type": "object"
-      },
-      "WithdrawTxBodyEnvelope": {
-        "description": "The \"type\" property of \"txBody\" must be \"TxBody BabbageEra\" or \"TxBody ConwayEra\"",
-        "properties": {
-          "txBody": {
-            "$ref": "#/components/schemas/TextEnvelope"
-          },
-          "withdrawalId": {
-            "$ref": "#/components/schemas/TxId"
-          }
-        },
-        "required": ["withdrawalId", "txBody"],
-        "type": "object"
-      },
-      "WithdrawTxEnvelope": {
-        "description": "The \"type\" property of \"tx\" must be \"Tx BabbageEra\" or \"Tx ConwayEra\"",
-        "properties": {
-          "tx": {
-            "$ref": "#/components/schemas/TextEnvelope"
-          },
-          "withdrawalId": {
-            "$ref": "#/components/schemas/TxId"
-          }
-        },
-        "required": ["withdrawalId", "tx"],
         "type": "object"
       },
       "Withdrawal": {
@@ -2762,7 +2604,7 @@
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
     },
     "title": "Marlowe Runtime REST API",
-    "version": "0.0.5.1"
+    "version": "0.0.5"
   },
   "openapi": "3.0.0",
   "paths": {
@@ -2900,7 +2742,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -2930,7 +2772,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -2960,7 +2802,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3082,7 +2924,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3112,7 +2954,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3142,7 +2984,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3242,7 +3084,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3272,7 +3114,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3302,7 +3144,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3396,7 +3238,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3426,7 +3268,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3456,7 +3298,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3545,7 +3387,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3575,7 +3417,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3605,7 +3447,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3691,7 +3533,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3721,7 +3563,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3751,7 +3593,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3837,7 +3679,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3867,7 +3709,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3897,7 +3739,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -3987,7 +3829,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4017,7 +3859,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4047,7 +3889,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4072,10 +3914,9 @@
         "summary": "Submit contract to chain"
       }
     },
-    "/contracts/{contractId}/next": {
+    "/contracts/{contractId}/next/getNextStepsForContract": {
       "get": {
         "description": "Get inputs which could be performed on a contract withing a time range by the requested parties.",
-        "operationId": "getNextStepsForContract",
         "parameters": [
           {
             "in": "path",
@@ -4168,7 +4009,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4198,7 +4039,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4228,7 +4069,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4283,7 +4124,7 @@
             "content": {
               "application/json;charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetTransactionsResponse"
+                  "$ref": "#/components/schemas/GetContractsResponse"
                 }
               }
             },
@@ -4352,7 +4193,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4382,7 +4223,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4412,7 +4253,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4537,7 +4378,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4567,7 +4408,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4597,7 +4438,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4696,7 +4537,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4726,7 +4567,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4756,7 +4597,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4856,7 +4697,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4886,7 +4727,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4916,7 +4757,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -4943,8 +4784,6 @@
     },
     "/healthcheck": {
       "get": {
-        "description": "Check if the server is running and ready to respond to requests.",
-        "operationId": "healthcheck",
         "responses": {
           "200": {
             "content": {
@@ -4989,7 +4828,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5019,7 +4858,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5049,7 +4888,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5064,8 +4903,7 @@
             }
           }
         },
-        "security": [],
-        "summary": "Test server status"
+        "security": []
       }
     },
     "/payouts": {
@@ -5123,7 +4961,7 @@
             "content": {
               "application/json;charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetPayoutsResponse"
+                  "$ref": "#/components/schemas/GetContractsResponse"
                 }
               }
             },
@@ -5192,7 +5030,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5222,7 +5060,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5252,7 +5090,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5338,7 +5176,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5368,7 +5206,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5398,7 +5236,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5451,7 +5289,7 @@
             "content": {
               "application/json;charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetWithdrawalsResponse"
+                  "$ref": "#/components/schemas/GetContractsResponse"
                 }
               }
             },
@@ -5520,7 +5358,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5550,7 +5388,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5580,7 +5418,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5691,7 +5529,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5721,7 +5559,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5751,7 +5589,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5836,7 +5674,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5866,7 +5704,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5896,7 +5734,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -5985,7 +5823,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -6015,7 +5853,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
@@ -6045,7 +5883,7 @@
                           "type": "string"
                         }
                       },
-                      "required": ["blockHeader", "slotTimeUTC"],
+                      "required": ["genesisTimeUTC"],
                       "type": "object"
                     }
                   ]
