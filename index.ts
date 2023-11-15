@@ -1,1 +1,1 @@
-export * from "marlowe-typescript-sdk";
+export * from "marlowe-typescript-generated";
