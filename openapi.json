@@ -2,7 +2,7 @@
   "components": {
     "schemas": {
       "Action": {
-        "description": "A contract which becomes active when an action occurs.",
+        "description": "A contract which becomes active when an action  occurs.",
         "oneOf": [
           {
             "properties": {
