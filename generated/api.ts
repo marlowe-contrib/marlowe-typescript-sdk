@@ -24,94 +24,119 @@ import type { RequestArgs } from './base';
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
 /**
+ * @type AccountTokenTupleInner
+ * @export
+ */
+export type AccountTokenTupleInner = Party | Token;
+
+/**
  * @type Action
  * A contract which becomes active when an action occurs.
  * @export
  */
-export type Action = ActionOneOf | ActionOneOf1 | ActionOneOf2;
+export type Action = ChoiceAction | DepositAction | NotifyAction;
 
 /**
  * @type ActionObject
  * A contract which becomes active when an action occurs.
  * @export
  */
-export type ActionObject = ActionObjectOneOf | ActionOneOf | ActionOneOf1 | ActionOneOf2;
+export type ActionObject = ChoiceActionObject | DepositActionObject | LabelRef | NotifyActionObject;
 
 /**
  * 
  * @export
- * @interface ActionObjectOneOf
+ * @interface Add
  */
-export interface ActionObjectOneOf {
-    /**
-     * An arbitrary text identifier for an object in a Marlowe object bundle.
-     * @type {string}
-     * @memberof ActionObjectOneOf
-     */
-    'ref': string;
-}
-/**
- * 
- * @export
- * @interface ActionOneOf
- */
-export interface ActionOneOf {
+export interface Add {
     /**
      * 
      * @type {Value}
-     * @memberof ActionOneOf
+     * @memberof Add
      */
-    'deposits': Value;
+    'add': Value;
     /**
      * 
-     * @type {Party}
-     * @memberof ActionOneOf
+     * @type {Value}
+     * @memberof Add
      */
-    'into_account': Party;
-    /**
-     * 
-     * @type {Token}
-     * @memberof ActionOneOf
-     */
-    'of_token': Token;
-    /**
-     * 
-     * @type {Party}
-     * @memberof ActionOneOf
-     */
-    'party': Party;
+    'and': Value;
 }
 /**
  * 
  * @export
- * @interface ActionOneOf1
+ * @interface AddObject
  */
-export interface ActionOneOf1 {
+export interface AddObject {
     /**
      * 
-     * @type {Array<Bound>}
-     * @memberof ActionOneOf1
+     * @type {ValueObject}
+     * @memberof AddObject
      */
-    'choose_between': Array<Bound>;
+    'add': ValueObject;
     /**
      * 
-     * @type {ChoiceId}
-     * @memberof ActionOneOf1
+     * @type {ValueObject}
+     * @memberof AddObject
      */
-    'for_choice': ChoiceId;
+    'and': ValueObject;
 }
 /**
  * 
  * @export
- * @interface ActionOneOf2
+ * @interface AddressAndMetadata
  */
-export interface ActionOneOf2 {
+export interface AddressAndMetadata {
+    /**
+     * A cardano address, in Bech32 format
+     * @type {string}
+     * @memberof AddressAndMetadata
+     */
+    'address': string;
+    /**
+     * 
+     * @type {TokenMetadata}
+     * @memberof AddressAndMetadata
+     */
+    'metadata'?: TokenMetadata;
+}
+/**
+ * 
+ * @export
+ * @interface And
+ */
+export interface And {
     /**
      * 
      * @type {Observation}
-     * @memberof ActionOneOf2
+     * @memberof And
      */
-    'notify_if': Observation;
+    'and': Observation;
+    /**
+     * 
+     * @type {Observation}
+     * @memberof And
+     */
+    'both': Observation;
+}
+/**
+ * 
+ * @export
+ * @interface AndObject
+ */
+export interface AndObject {
+    /**
+     * 
+     * @type {ObservationObject}
+     * @memberof AndObject
+     */
+    'and': ObservationObject;
+    /**
+     * 
+     * @type {ObservationObject}
+     * @memberof AndObject
+     */
+    'both': ObservationObject;
 }
 /**
  * Applicable Inputs for a given contract
@@ -194,6 +219,57 @@ export interface ApplyInputsTxEnvelope {
      * @memberof ApplyInputsTxEnvelope
      */
     'tx': TextEnvelope;
+}
+/**
+ * Check an observation and produce a warning if it is false.
+ * @export
+ * @interface Assert
+ */
+export interface Assert {
+    /**
+     * 
+     * @type {Observation}
+     * @memberof Assert
+     */
+    'assert': Observation;
+    /**
+     * 
+     * @type {Contract}
+     * @memberof Assert
+     */
+    'then': Contract;
+}
+/**
+ * A semantics assertion failed.
+ * @export
+ * @enum {string}
+ */
+
+export const AssertFail = {
+    AssertionFailed: 'assertion_failed'
+} as const;
+
+export type AssertFail = typeof AssertFail[keyof typeof AssertFail];
+
+
+/**
+ * Check an observation and produce a warning if it is false.
+ * @export
+ * @interface AssertObject
+ */
+export interface AssertObject {
+    /**
+     * 
+     * @type {ObservationObject}
+     * @memberof AssertObject
+     */
+    'assert': ObservationObject;
+    /**
+     * 
+     * @type {ContractObject}
+     * @memberof AssertObject
+     */
+    'then': ContractObject;
 }
 /**
  * 
@@ -375,90 +451,159 @@ export interface CanNotify {
  * A contract which becomes active when an action occurs.
  * @export
  */
-export type Case = CaseOneOf | CaseOneOf1;
-
-/**
- * @type CaseObject
- * A contract which becomes active when an action occurs.
- * @export
- */
-export type CaseObject = CaseObjectOneOf | CaseObjectOneOf1;
+export type Case = CaseMerkleizedThen | CaseThen;
 
 /**
  * 
  * @export
- * @interface CaseObjectOneOf
+ * @interface CaseMerkleizedThen
  */
-export interface CaseObjectOneOf {
+export interface CaseMerkleizedThen {
     /**
      * 
-     * @type {ActionObject}
-     * @memberof CaseObjectOneOf
+     * @type {Action}
+     * @memberof CaseMerkleizedThen
      */
-    'case': ActionObject;
-    /**
-     * 
-     * @type {ContractObject}
-     * @memberof CaseObjectOneOf
-     */
-    'then': ContractObject;
-}
-/**
- * 
- * @export
- * @interface CaseObjectOneOf1
- */
-export interface CaseObjectOneOf1 {
-    /**
-     * 
-     * @type {ActionObject}
-     * @memberof CaseObjectOneOf1
-     */
-    'case': ActionObject;
+    'case': Action;
     /**
      * 
      * @type {string}
-     * @memberof CaseObjectOneOf1
+     * @memberof CaseMerkleizedThen
      */
     'merkleized_then': string;
 }
 /**
  * 
  * @export
- * @interface CaseOneOf
+ * @interface CaseMerkleizedThenObject
  */
-export interface CaseOneOf {
+export interface CaseMerkleizedThenObject {
+    /**
+     * 
+     * @type {ActionObject}
+     * @memberof CaseMerkleizedThenObject
+     */
+    'case': ActionObject;
+    /**
+     * 
+     * @type {string}
+     * @memberof CaseMerkleizedThenObject
+     */
+    'merkleized_then': string;
+}
+/**
+ * @type CaseObject
+ * A contract which becomes active when an action occurs.
+ * @export
+ */
+export type CaseObject = CaseMerkleizedThenObject | CaseThenObject;
+
+/**
+ * 
+ * @export
+ * @interface CaseThen
+ */
+export interface CaseThen {
     /**
      * 
      * @type {Action}
-     * @memberof CaseOneOf
+     * @memberof CaseThen
      */
     'case': Action;
     /**
      * 
      * @type {Contract}
-     * @memberof CaseOneOf
+     * @memberof CaseThen
      */
     'then': Contract;
 }
 /**
  * 
  * @export
- * @interface CaseOneOf1
+ * @interface CaseThenObject
  */
-export interface CaseOneOf1 {
+export interface CaseThenObject {
     /**
      * 
-     * @type {Action}
-     * @memberof CaseOneOf1
+     * @type {ActionObject}
+     * @memberof CaseThenObject
      */
-    'case': Action;
+    'case': ActionObject;
+    /**
+     * 
+     * @type {ContractObject}
+     * @memberof CaseThenObject
+     */
+    'then': ContractObject;
+}
+/**
+ * 
+ * @export
+ * @interface ChoiceAction
+ */
+export interface ChoiceAction {
+    /**
+     * 
+     * @type {Array<Bound>}
+     * @memberof ChoiceAction
+     */
+    'choose_between': Array<Bound>;
+    /**
+     * 
+     * @type {ChoiceId}
+     * @memberof ChoiceAction
+     */
+    'for_choice': ChoiceId;
+}
+/**
+ * 
+ * @export
+ * @interface ChoiceActionObject
+ */
+export interface ChoiceActionObject {
+    /**
+     * 
+     * @type {Array<Bound>}
+     * @memberof ChoiceActionObject
+     */
+    'choose_between': Array<Bound>;
+    /**
+     * 
+     * @type {ChoiceId}
+     * @memberof ChoiceActionObject
+     */
+    'for_choice': ChoiceId;
+}
+/**
+ * Make a choice in a contract and provide the continuation of the contract
+ * @export
+ * @interface ChoiceContinuationInput
+ */
+export interface ChoiceContinuationInput {
     /**
      * 
      * @type {string}
-     * @memberof CaseOneOf1
+     * @memberof ChoiceContinuationInput
      */
-    'merkleized_then': string;
+    'continuation_hash': string;
+    /**
+     * 
+     * @type {ChoiceId}
+     * @memberof ChoiceContinuationInput
+     */
+    'for_choice_id': ChoiceId;
+    /**
+     * 
+     * @type {number}
+     * @memberof ChoiceContinuationInput
+     */
+    'input_that_chooses_num': number;
+    /**
+     * 
+     * @type {Contract}
+     * @memberof ChoiceContinuationInput
+     */
+    'merkleized_continuation': Contract;
 }
 /**
  * Refers to a party by role name.
@@ -499,11 +644,101 @@ export interface ChoiceIdObject {
     'choice_owner': PartyObject;
 }
 /**
+ * Make a choice in a contract
+ * @export
+ * @interface ChoiceInput
+ */
+export interface ChoiceInput {
+    /**
+     * 
+     * @type {ChoiceId}
+     * @memberof ChoiceInput
+     */
+    'for_choice_id': ChoiceId;
+    /**
+     * 
+     * @type {number}
+     * @memberof ChoiceInput
+     */
+    'input_that_chooses_num': number;
+}
+/**
+ * 
+ * @export
+ * @interface ChooseFor
+ */
+export interface ChooseFor {
+    /**
+     * 
+     * @type {ChoiceId}
+     * @memberof ChooseFor
+     */
+    'chose_something_for': ChoiceId;
+}
+/**
+ * 
+ * @export
+ * @interface ChooseForObject
+ */
+export interface ChooseForObject {
+    /**
+     * 
+     * @type {ChoiceIdObject}
+     * @memberof ChooseForObject
+     */
+    'chose_something_for': ChoiceIdObject;
+}
+/**
+ * No more payments will be sent and the balance of the contract is 0.
+ * @export
+ * @enum {string}
+ */
+
+export const Close = {
+    Close: 'close'
+} as const;
+
+export type Close = typeof Close[keyof typeof Close];
+
+
+/**
+ * No more payments will be sent and the balance of the contract is 0.
+ * @export
+ * @enum {string}
+ */
+
+export const CloseObject = {
+    Close: 'close'
+} as const;
+
+export type CloseObject = typeof CloseObject[keyof typeof CloseObject];
+
+
+/**
+ * Notify a contract to check a condition and provide the continuation of the contract
+ * @export
+ * @interface ContinuationInput
+ */
+export interface ContinuationInput {
+    /**
+     * 
+     * @type {string}
+     * @memberof ContinuationInput
+     */
+    'continuation_hash': string;
+    /**
+     * 
+     * @type {Contract}
+     * @memberof ContinuationInput
+     */
+    'merkleized_continuation': Contract;
+}
+/**
  * @type Contract
  * Contract terms specified in Marlowe
  * @export
  */
-export type Contract = ContractOneOf | ContractOneOf1 | ContractOneOf2 | ContractOneOf3 | ContractOneOf4 | string;
+export type Contract = Assert | Close | If | Let | Pay | When;
 
 /**
  * 
@@ -531,10 +766,10 @@ export interface ContractHeader {
     'contractId': string;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof ContractHeader
      */
-    'metadata': { [key: string]: any | undefined; };
+    'metadata': { [key: string]: Metadata | undefined; };
     /**
      * The hex-encoded minting policy ID for a native Cardano token
      * @type {string}
@@ -549,10 +784,10 @@ export interface ContractHeader {
     'status': TxStatus;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof ContractHeader
      */
-    'tags': { [key: string]: any | undefined; };
+    'tags': { [key: string]: Metadata | undefined; };
     /**
      * 
      * @type {MarloweVersion}
@@ -567,270 +802,8 @@ export interface ContractHeader {
  * Contract terms specified in Marlowe
  * @export
  */
-export type ContractObject = ActionObjectOneOf | ContractObjectOneOf | ContractObjectOneOf1 | ContractObjectOneOf2 | ContractObjectOneOf3 | ContractObjectOneOf4 | string;
+export type ContractObject = AssertObject | CloseObject | IfObject | LabelRef | LetObject | PayObject | WhenObject;
 
-/**
- * A payment will be sent from an account to a payee.
- * @export
- * @interface ContractObjectOneOf
- */
-export interface ContractObjectOneOf {
-    /**
-     * 
-     * @type {PartyObject}
-     * @memberof ContractObjectOneOf
-     */
-    'from_account': PartyObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ContractObjectOneOf
-     */
-    'pay': ValueObject;
-    /**
-     * 
-     * @type {ContractObject}
-     * @memberof ContractObjectOneOf
-     */
-    'then': ContractObject;
-    /**
-     * 
-     * @type {PayeeObject}
-     * @memberof ContractObjectOneOf
-     */
-    'to': PayeeObject;
-    /**
-     * 
-     * @type {TokenObject}
-     * @memberof ContractObjectOneOf
-     */
-    'token': TokenObject;
-}
-/**
- * If an observation is true, the first contract applies, otherwise the second contract applies.
- * @export
- * @interface ContractObjectOneOf1
- */
-export interface ContractObjectOneOf1 {
-    /**
-     * 
-     * @type {ContractObject}
-     * @memberof ContractObjectOneOf1
-     */
-    'else': ContractObject;
-    /**
-     * 
-     * @type {ObservationObject}
-     * @memberof ContractObjectOneOf1
-     */
-    'if': ObservationObject;
-    /**
-     * 
-     * @type {ContractObject}
-     * @memberof ContractObjectOneOf1
-     */
-    'then': ContractObject;
-}
-/**
- * Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.
- * @export
- * @interface ContractObjectOneOf2
- */
-export interface ContractObjectOneOf2 {
-    /**
-     * 
-     * @type {number}
-     * @memberof ContractObjectOneOf2
-     */
-    'timeout': number;
-    /**
-     * 
-     * @type {ContractObject}
-     * @memberof ContractObjectOneOf2
-     */
-    'timeout_continuation': ContractObject;
-    /**
-     * 
-     * @type {Array<CaseObject>}
-     * @memberof ContractObjectOneOf2
-     */
-    'when': Array<CaseObject>;
-}
-/**
- * Bind a value to a name within the scope of a sub-contract.
- * @export
- * @interface ContractObjectOneOf3
- */
-export interface ContractObjectOneOf3 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ContractObjectOneOf3
-     */
-    'be': ValueObject;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContractObjectOneOf3
-     */
-    'let': string;
-    /**
-     * 
-     * @type {ContractObject}
-     * @memberof ContractObjectOneOf3
-     */
-    'then': ContractObject;
-}
-/**
- * Check an observation and produce a warning if it is false.
- * @export
- * @interface ContractObjectOneOf4
- */
-export interface ContractObjectOneOf4 {
-    /**
-     * 
-     * @type {ObservationObject}
-     * @memberof ContractObjectOneOf4
-     */
-    'assert': ObservationObject;
-    /**
-     * 
-     * @type {ContractObject}
-     * @memberof ContractObjectOneOf4
-     */
-    'then': ContractObject;
-}
-/**
- * A payment will be sent from an account to a payee.
- * @export
- * @interface ContractOneOf
- */
-export interface ContractOneOf {
-    /**
-     * 
-     * @type {Party}
-     * @memberof ContractOneOf
-     */
-    'from_account': Party;
-    /**
-     * 
-     * @type {Value}
-     * @memberof ContractOneOf
-     */
-    'pay': Value;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof ContractOneOf
-     */
-    'then': Contract;
-    /**
-     * 
-     * @type {Payee}
-     * @memberof ContractOneOf
-     */
-    'to': Payee;
-    /**
-     * 
-     * @type {Token}
-     * @memberof ContractOneOf
-     */
-    'token': Token;
-}
-/**
- * If an observation is true, the first contract applies, otherwise the second contract applies.
- * @export
- * @interface ContractOneOf1
- */
-export interface ContractOneOf1 {
-    /**
-     * 
-     * @type {Contract}
-     * @memberof ContractOneOf1
-     */
-    'else': Contract;
-    /**
-     * 
-     * @type {Observation}
-     * @memberof ContractOneOf1
-     */
-    'if': Observation;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof ContractOneOf1
-     */
-    'then': Contract;
-}
-/**
- * Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.
- * @export
- * @interface ContractOneOf2
- */
-export interface ContractOneOf2 {
-    /**
-     * 
-     * @type {number}
-     * @memberof ContractOneOf2
-     */
-    'timeout': number;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof ContractOneOf2
-     */
-    'timeout_continuation': Contract;
-    /**
-     * 
-     * @type {Array<Case>}
-     * @memberof ContractOneOf2
-     */
-    'when': Array<Case>;
-}
-/**
- * Bind a value to a name within the scope of a sub-contract.
- * @export
- * @interface ContractOneOf3
- */
-export interface ContractOneOf3 {
-    /**
-     * 
-     * @type {Value}
-     * @memberof ContractOneOf3
-     */
-    'be': Value;
-    /**
-     * 
-     * @type {string}
-     * @memberof ContractOneOf3
-     */
-    'let': string;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof ContractOneOf3
-     */
-    'then': Contract;
-}
-/**
- * Check an observation and produce a warning if it is false.
- * @export
- * @interface ContractOneOf4
- */
-export interface ContractOneOf4 {
-    /**
-     * 
-     * @type {Observation}
-     * @memberof ContractOneOf4
-     */
-    'assert': Observation;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof ContractOneOf4
-     */
-    'then': Contract;
-}
 /**
  * 
  * @export
@@ -888,10 +861,10 @@ export interface ContractState {
     'initialContract': Contract;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof ContractState
      */
-    'metadata': { [key: string]: any | undefined; };
+    'metadata': { [key: string]: Metadata | undefined; };
     /**
      * The hex-encoded minting policy ID for a native Cardano token
      * @type {string}
@@ -912,10 +885,10 @@ export interface ContractState {
     'status': TxStatus;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof ContractState
      */
-    'tags': { [key: string]: any | undefined; };
+    'tags': { [key: string]: Metadata | undefined; };
     /**
      * 
      * @type {TextEnvelope}
@@ -1024,6 +997,218 @@ export interface CreateTxEnvelope {
      * @memberof CreateTxEnvelope
      */
     'tx': TextEnvelope;
+}
+/**
+ * 
+ * @export
+ * @interface DepositAction
+ */
+export interface DepositAction {
+    /**
+     * 
+     * @type {Value}
+     * @memberof DepositAction
+     */
+    'deposits': Value;
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositAction
+     */
+    'into_account': Party;
+    /**
+     * 
+     * @type {Token}
+     * @memberof DepositAction
+     */
+    'of_token': Token;
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositAction
+     */
+    'party': Party;
+}
+/**
+ * 
+ * @export
+ * @interface DepositActionObject
+ */
+export interface DepositActionObject {
+    /**
+     * 
+     * @type {Value}
+     * @memberof DepositActionObject
+     */
+    'deposits': Value;
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositActionObject
+     */
+    'into_account': Party;
+    /**
+     * 
+     * @type {Token}
+     * @memberof DepositActionObject
+     */
+    'of_token': Token;
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositActionObject
+     */
+    'party': Party;
+}
+/**
+ * Deposit funds into an account in a contract and provide the continuation of the contract
+ * @export
+ * @interface DepositContinuationInput
+ */
+export interface DepositContinuationInput {
+    /**
+     * 
+     * @type {string}
+     * @memberof DepositContinuationInput
+     */
+    'continuation_hash': string;
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositContinuationInput
+     */
+    'input_from_party': Party;
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositContinuationInput
+     */
+    'into_account': Party;
+    /**
+     * 
+     * @type {Contract}
+     * @memberof DepositContinuationInput
+     */
+    'merkleized_continuation': Contract;
+    /**
+     * 
+     * @type {Token}
+     * @memberof DepositContinuationInput
+     */
+    'of_token': Token;
+    /**
+     * 
+     * @type {number}
+     * @memberof DepositContinuationInput
+     */
+    'that_deposits': number;
+}
+/**
+ * Deposit funds into an account in a contract
+ * @export
+ * @interface DepositInput
+ */
+export interface DepositInput {
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositInput
+     */
+    'input_from_party': Party;
+    /**
+     * 
+     * @type {Party}
+     * @memberof DepositInput
+     */
+    'into_account': Party;
+    /**
+     * 
+     * @type {Token}
+     * @memberof DepositInput
+     */
+    'of_token': Token;
+    /**
+     * 
+     * @type {number}
+     * @memberof DepositInput
+     */
+    'that_deposits': number;
+}
+/**
+ * 
+ * @export
+ * @interface Divide
+ */
+export interface Divide {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Divide
+     */
+    'by': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof Divide
+     */
+    'divide': Value;
+}
+/**
+ * 
+ * @export
+ * @interface DivideObject
+ */
+export interface DivideObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof DivideObject
+     */
+    'by': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof DivideObject
+     */
+    'divide': ValueObject;
+}
+/**
+ * 
+ * @export
+ * @interface Equal
+ */
+export interface Equal {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Equal
+     */
+    'equal_to': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof Equal
+     */
+    'value': Value;
+}
+/**
+ * 
+ * @export
+ * @interface EqualObject
+ */
+export interface EqualObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof EqualObject
+     */
+    'equal_to': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof EqualObject
+     */
+    'value': ValueObject;
 }
 /**
  * 
@@ -1332,231 +1517,277 @@ export interface GetWithdrawalsResponseResultsInnerLinks {
     'withdrawal'?: string;
 }
 /**
+ * 
+ * @export
+ * @interface Greater
+ */
+export interface Greater {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Greater
+     */
+    'gt': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof Greater
+     */
+    'value': Value;
+}
+/**
+ * 
+ * @export
+ * @interface GreaterObject
+ */
+export interface GreaterObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof GreaterObject
+     */
+    'gt': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof GreaterObject
+     */
+    'value': ValueObject;
+}
+/**
+ * 
+ * @export
+ * @interface GreaterOrEqual
+ */
+export interface GreaterOrEqual {
+    /**
+     * 
+     * @type {Value}
+     * @memberof GreaterOrEqual
+     */
+    'ge_than': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof GreaterOrEqual
+     */
+    'value': Value;
+}
+/**
+ * 
+ * @export
+ * @interface GreaterOrEqualObject
+ */
+export interface GreaterOrEqualObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof GreaterOrEqualObject
+     */
+    'ge_than': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof GreaterOrEqualObject
+     */
+    'value': ValueObject;
+}
+/**
+ * If an observation is true, the first contract applies, otherwise the second contract applies.
+ * @export
+ * @interface If
+ */
+export interface If {
+    /**
+     * 
+     * @type {Contract}
+     * @memberof If
+     */
+    'else': Contract;
+    /**
+     * 
+     * @type {Observation}
+     * @memberof If
+     */
+    'if': Observation;
+    /**
+     * 
+     * @type {Contract}
+     * @memberof If
+     */
+    'then': Contract;
+}
+/**
+ * If an observation is true, the first contract applies, otherwise the second contract applies.
+ * @export
+ * @interface IfObject
+ */
+export interface IfObject {
+    /**
+     * 
+     * @type {ContractObject}
+     * @memberof IfObject
+     */
+    'else': ContractObject;
+    /**
+     * 
+     * @type {ObservationObject}
+     * @memberof IfObject
+     */
+    'if': ObservationObject;
+    /**
+     * 
+     * @type {ContractObject}
+     * @memberof IfObject
+     */
+    'then': ContractObject;
+}
+/**
+ * 
+ * @export
+ * @interface IfValue
+ */
+export interface IfValue {
+    /**
+     * 
+     * @type {Value}
+     * @memberof IfValue
+     */
+    'else': Value;
+    /**
+     * 
+     * @type {Observation}
+     * @memberof IfValue
+     */
+    'if': Observation;
+    /**
+     * 
+     * @type {Value}
+     * @memberof IfValue
+     */
+    'then': Value;
+}
+/**
+ * 
+ * @export
+ * @interface IfValueObject
+ */
+export interface IfValueObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof IfValueObject
+     */
+    'else': ValueObject;
+    /**
+     * 
+     * @type {ObservationObject}
+     * @memberof IfValueObject
+     */
+    'if': ObservationObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof IfValueObject
+     */
+    'then': ValueObject;
+}
+/**
  * @type Input
  * An input to a Marlowe transaction
  * @export
  */
-export type Input = InputOneOf | InputOneOf1 | InputOneOf2 | InputOneOf3 | InputOneOf4 | string;
+export type Input = ChoiceContinuationInput | ChoiceInput | ContinuationInput | DepositContinuationInput | DepositInput | NotifyInput;
 
-/**
- * Notify a contract to check a condition and provide the continuation of the contract
- * @export
- * @interface InputOneOf
- */
-export interface InputOneOf {
-    /**
-     * 
-     * @type {string}
-     * @memberof InputOneOf
-     */
-    'continuation_hash': string;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof InputOneOf
-     */
-    'merkleized_continuation': Contract;
-}
-/**
- * Make a choice in a contract and provide the continuation of the contract
- * @export
- * @interface InputOneOf1
- */
-export interface InputOneOf1 {
-    /**
-     * 
-     * @type {string}
-     * @memberof InputOneOf1
-     */
-    'continuation_hash': string;
-    /**
-     * 
-     * @type {ChoiceId}
-     * @memberof InputOneOf1
-     */
-    'for_choice_id': ChoiceId;
-    /**
-     * 
-     * @type {number}
-     * @memberof InputOneOf1
-     */
-    'input_that_chooses_num': number;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof InputOneOf1
-     */
-    'merkleized_continuation': Contract;
-}
-/**
- * Make a choice in a contract
- * @export
- * @interface InputOneOf2
- */
-export interface InputOneOf2 {
-    /**
-     * 
-     * @type {ChoiceId}
-     * @memberof InputOneOf2
-     */
-    'for_choice_id': ChoiceId;
-    /**
-     * 
-     * @type {number}
-     * @memberof InputOneOf2
-     */
-    'input_that_chooses_num': number;
-}
-/**
- * Deposit funds into an account in a contract and provide the continuation of the contract
- * @export
- * @interface InputOneOf3
- */
-export interface InputOneOf3 {
-    /**
-     * 
-     * @type {string}
-     * @memberof InputOneOf3
-     */
-    'continuation_hash': string;
-    /**
-     * 
-     * @type {Party}
-     * @memberof InputOneOf3
-     */
-    'input_from_party': Party;
-    /**
-     * 
-     * @type {Party}
-     * @memberof InputOneOf3
-     */
-    'into_account': Party;
-    /**
-     * 
-     * @type {Contract}
-     * @memberof InputOneOf3
-     */
-    'merkleized_continuation': Contract;
-    /**
-     * 
-     * @type {Token}
-     * @memberof InputOneOf3
-     */
-    'of_token': Token;
-    /**
-     * 
-     * @type {number}
-     * @memberof InputOneOf3
-     */
-    'that_deposits': number;
-}
-/**
- * Deposit funds into an account in a contract
- * @export
- * @interface InputOneOf4
- */
-export interface InputOneOf4 {
-    /**
-     * 
-     * @type {Party}
-     * @memberof InputOneOf4
-     */
-    'input_from_party': Party;
-    /**
-     * 
-     * @type {Party}
-     * @memberof InputOneOf4
-     */
-    'into_account': Party;
-    /**
-     * 
-     * @type {Token}
-     * @memberof InputOneOf4
-     */
-    'of_token': Token;
-    /**
-     * 
-     * @type {number}
-     * @memberof InputOneOf4
-     */
-    'that_deposits': number;
-}
 /**
  * @type IntervalError
  * A Marlowe transaction interval error.
  * @export
  */
-export type IntervalError = IntervalErrorOneOf | IntervalErrorOneOf1;
+export type IntervalError = IntervalInPast | InvalidInterval;
 
-/**
- * Invalid Marlowe transaction interval.
- * @export
- * @interface IntervalErrorOneOf
- */
-export interface IntervalErrorOneOf {
-    /**
-     * 
-     * @type {IntervalErrorOneOfInvalidInterval}
-     * @memberof IntervalErrorOneOf
-     */
-    'invalidInterval': IntervalErrorOneOfInvalidInterval;
-}
 /**
  * Marlowe transaction interval in past.
  * @export
- * @interface IntervalErrorOneOf1
+ * @interface IntervalInPast
  */
-export interface IntervalErrorOneOf1 {
+export interface IntervalInPast {
     /**
      * 
-     * @type {IntervalErrorOneOf1IntervalInPastError}
-     * @memberof IntervalErrorOneOf1
+     * @type {IntervalInPastIntervalInPastError}
+     * @memberof IntervalInPast
      */
-    'intervalInPastError': IntervalErrorOneOf1IntervalInPastError;
+    'intervalInPastError': IntervalInPastIntervalInPastError;
 }
 /**
  * 
  * @export
- * @interface IntervalErrorOneOf1IntervalInPastError
+ * @interface IntervalInPastIntervalInPastError
  */
-export interface IntervalErrorOneOf1IntervalInPastError {
+export interface IntervalInPastIntervalInPastError {
     /**
      * 
      * @type {number}
-     * @memberof IntervalErrorOneOf1IntervalInPastError
+     * @memberof IntervalInPastIntervalInPastError
      */
     'from': number;
     /**
      * 
      * @type {number}
-     * @memberof IntervalErrorOneOf1IntervalInPastError
+     * @memberof IntervalInPastIntervalInPastError
      */
     'minTime': number;
     /**
      * 
      * @type {number}
-     * @memberof IntervalErrorOneOf1IntervalInPastError
+     * @memberof IntervalInPastIntervalInPastError
+     */
+    'to': number;
+}
+/**
+ * Invalid Marlowe transaction interval.
+ * @export
+ * @interface InvalidInterval
+ */
+export interface InvalidInterval {
+    /**
+     * 
+     * @type {InvalidIntervalInvalidInterval}
+     * @memberof InvalidInterval
+     */
+    'invalidInterval': InvalidIntervalInvalidInterval;
+}
+/**
+ * 
+ * @export
+ * @interface InvalidIntervalInvalidInterval
+ */
+export interface InvalidIntervalInvalidInterval {
+    /**
+     * 
+     * @type {number}
+     * @memberof InvalidIntervalInvalidInterval
+     */
+    'from': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvalidIntervalInvalidInterval
      */
     'to': number;
 }
 /**
  * 
  * @export
- * @interface IntervalErrorOneOfInvalidInterval
+ * @interface LabelRef
  */
-export interface IntervalErrorOneOfInvalidInterval {
+export interface LabelRef {
     /**
-     * 
-     * @type {number}
-     * @memberof IntervalErrorOneOfInvalidInterval
+     * An arbitrary text identifier for an object in a Marlowe object bundle.
+     * @type {string}
+     * @memberof LabelRef
      */
-    'from': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof IntervalErrorOneOfInvalidInterval
-     */
-    'to': number;
+    'ref': string;
 }
 /**
  * A bundle of labelled Marlowe objects in define-before-use order.
@@ -1602,6 +1833,132 @@ export type LabelledObjectTypeEnum = typeof LabelledObjectTypeEnum[keyof typeof 
 export type LabelledObjectValue = ActionObject | ContractObject | ObservationObject | PartyObject | TokenObject | ValueObject;
 
 /**
+ * 
+ * @export
+ * @interface Lesser
+ */
+export interface Lesser {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Lesser
+     */
+    'lt': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof Lesser
+     */
+    'value': Value;
+}
+/**
+ * 
+ * @export
+ * @interface LesserObject
+ */
+export interface LesserObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof LesserObject
+     */
+    'lt': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof LesserObject
+     */
+    'value': ValueObject;
+}
+/**
+ * 
+ * @export
+ * @interface LesserOrEqual
+ */
+export interface LesserOrEqual {
+    /**
+     * 
+     * @type {Value}
+     * @memberof LesserOrEqual
+     */
+    'le_than': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof LesserOrEqual
+     */
+    'value': Value;
+}
+/**
+ * 
+ * @export
+ * @interface LesserOrEqualObject
+ */
+export interface LesserOrEqualObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof LesserOrEqualObject
+     */
+    'le_than': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof LesserOrEqualObject
+     */
+    'value': ValueObject;
+}
+/**
+ * Bind a value to a name within the scope of a sub-contract.
+ * @export
+ * @interface Let
+ */
+export interface Let {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Let
+     */
+    'be': Value;
+    /**
+     * 
+     * @type {string}
+     * @memberof Let
+     */
+    'let': string;
+    /**
+     * 
+     * @type {Contract}
+     * @memberof Let
+     */
+    'then': Contract;
+}
+/**
+ * Bind a value to a name within the scope of a sub-contract.
+ * @export
+ * @interface LetObject
+ */
+export interface LetObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof LetObject
+     */
+    'be': ValueObject;
+    /**
+     * 
+     * @type {string}
+     * @memberof LetObject
+     */
+    'let': string;
+    /**
+     * 
+     * @type {ContractObject}
+     * @memberof LetObject
+     */
+    'then': ContractObject;
+}
+/**
  * The on-chain state of a Marlowe contract.
  * @export
  * @interface MarloweState
@@ -1636,13 +1993,7 @@ export interface MarloweState {
  * @type MarloweStateAccountsInnerInner
  * @export
  */
-export type MarloweStateAccountsInnerInner = Array<MarloweStateAccountsInnerInnerOneOfInner> | number;
-
-/**
- * @type MarloweStateAccountsInnerInnerOneOfInner
- * @export
- */
-export type MarloweStateAccountsInnerInnerOneOfInner = Party | Token;
+export type MarloweStateAccountsInnerInner = Array<AccountTokenTupleInner> | number;
 
 /**
  * @type MarloweStateBoundValuesInnerInner
@@ -1670,6 +2021,160 @@ export type MarloweVersion = typeof MarloweVersion[keyof typeof MarloweVersion];
 
 
 /**
+ * @type Metadata
+ * Arbitrary JSON-encoded transaction metadata
+ * @export
+ */
+export type Metadata = Array<Metadata> | number | string | { [key: string]: Metadata | undefined; };
+
+/**
+ * 
+ * @export
+ * @interface MetadataAndRecipients
+ */
+export interface MetadataAndRecipients {
+    /**
+     * 
+     * @type {TokenMetadata}
+     * @memberof MetadataAndRecipients
+     */
+    'metadata'?: TokenMetadata;
+    /**
+     * 
+     * @type {{ [key: string]: number | undefined; }}
+     * @memberof MetadataAndRecipients
+     */
+    'recipients': { [key: string]: number | undefined; };
+}
+/**
+ * 
+ * @export
+ * @interface MetadataAndScript
+ */
+export interface MetadataAndScript {
+    /**
+     * 
+     * @type {TokenMetadata}
+     * @memberof MetadataAndScript
+     */
+    'metadata'?: TokenMetadata;
+    /**
+     * The type of script receiving the role token.
+     * @type {string}
+     * @memberof MetadataAndScript
+     */
+    'script': MetadataAndScriptScriptEnum;
+}
+
+export const MetadataAndScriptScriptEnum = {
+    OpenRole: 'OpenRole'
+} as const;
+
+export type MetadataAndScriptScriptEnum = typeof MetadataAndScriptScriptEnum[keyof typeof MetadataAndScriptScriptEnum];
+
+/**
+ * 
+ * @export
+ * @interface Minus
+ */
+export interface Minus {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Minus
+     */
+    'minus': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof Minus
+     */
+    'value': Value;
+}
+/**
+ * 
+ * @export
+ * @interface MinusObject
+ */
+export interface MinusObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof MinusObject
+     */
+    'minus': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof MinusObject
+     */
+    'value': ValueObject;
+}
+/**
+ * 
+ * @export
+ * @interface Multiply
+ */
+export interface Multiply {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Multiply
+     */
+    'multiply': Value;
+    /**
+     * 
+     * @type {Value}
+     * @memberof Multiply
+     */
+    'times': Value;
+}
+/**
+ * 
+ * @export
+ * @interface MultiplyObject
+ */
+export interface MultiplyObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof MultiplyObject
+     */
+    'multiply': ValueObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof MultiplyObject
+     */
+    'times': ValueObject;
+}
+/**
+ * 
+ * @export
+ * @interface Negate
+ */
+export interface Negate {
+    /**
+     * 
+     * @type {Value}
+     * @memberof Negate
+     */
+    'negate': Value;
+}
+/**
+ * 
+ * @export
+ * @interface NegateObject
+ */
+export interface NegateObject {
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof NegateObject
+     */
+    'negate': ValueObject;
+}
+/**
  * Describe the reducibility (Can be Reduced ?) and the applicability (Can Inputs be Applied ?) for a given contract.
  * @export
  * @interface Next
@@ -1689,443 +2194,401 @@ export interface Next {
     'can_reduce': boolean;
 }
 /**
- * @type Observation
- * A time-varying expression that evaluates to an integer
+ * A warning for a non-positive deposit.
  * @export
+ * @interface NonPositiveDeposit
  */
-export type Observation = ObservationOneOf | ObservationOneOf1 | ObservationOneOf2 | ObservationOneOf3 | ObservationOneOf4 | ObservationOneOf5 | ObservationOneOf6 | ObservationOneOf7 | ObservationOneOf8 | boolean;
-
-/**
- * @type ObservationObject
- * A time-varying expression that evaluates to an integer
- * @export
- */
-export type ObservationObject = ActionObjectOneOf | ObservationObjectOneOf | ObservationObjectOneOf1 | ObservationObjectOneOf2 | ObservationObjectOneOf3 | ObservationObjectOneOf4 | ObservationObjectOneOf5 | ObservationObjectOneOf6 | ObservationObjectOneOf7 | ObservationObjectOneOf8 | boolean;
-
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf
- */
-export interface ObservationObjectOneOf {
+export interface NonPositiveDeposit {
     /**
      * 
-     * @type {ObservationObject}
-     * @memberof ObservationObjectOneOf
+     * @type {number}
+     * @memberof NonPositiveDeposit
      */
-    'and': ObservationObject;
+    'asked_to_deposit': number;
     /**
      * 
-     * @type {ObservationObject}
-     * @memberof ObservationObjectOneOf
+     * @type {Party}
+     * @memberof NonPositiveDeposit
      */
-    'both': ObservationObject;
+    'in_account': Party;
+    /**
+     * 
+     * @type {Token}
+     * @memberof NonPositiveDeposit
+     */
+    'of_token': Token;
+    /**
+     * 
+     * @type {Party}
+     * @memberof NonPositiveDeposit
+     */
+    'party': Party;
+}
+/**
+ * A warning for a non-positive payment.
+ * @export
+ * @interface NonPositivePayment
+ */
+export interface NonPositivePayment {
+    /**
+     * 
+     * @type {Party}
+     * @memberof NonPositivePayment
+     */
+    'account': Party;
+    /**
+     * 
+     * @type {number}
+     * @memberof NonPositivePayment
+     */
+    'asked_to_pay': number;
+    /**
+     * 
+     * @type {Token}
+     * @memberof NonPositivePayment
+     */
+    'of_token': Token;
+    /**
+     * 
+     * @type {Payee}
+     * @memberof NonPositivePayment
+     */
+    'to_payee': Payee;
 }
 /**
  * 
  * @export
- * @interface ObservationObjectOneOf1
+ * @interface Not
  */
-export interface ObservationObjectOneOf1 {
-    /**
-     * 
-     * @type {ObservationObject}
-     * @memberof ObservationObjectOneOf1
-     */
-    'either': ObservationObject;
-    /**
-     * 
-     * @type {ObservationObject}
-     * @memberof ObservationObjectOneOf1
-     */
-    'or': ObservationObject;
-}
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf2
- */
-export interface ObservationObjectOneOf2 {
-    /**
-     * 
-     * @type {ObservationObject}
-     * @memberof ObservationObjectOneOf2
-     */
-    'not': ObservationObject;
-}
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf3
- */
-export interface ObservationObjectOneOf3 {
-    /**
-     * 
-     * @type {ChoiceIdObject}
-     * @memberof ObservationObjectOneOf3
-     */
-    'chose_something_for': ChoiceIdObject;
-}
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf4
- */
-export interface ObservationObjectOneOf4 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf4
-     */
-    'ge_than': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf4
-     */
-    'value': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf5
- */
-export interface ObservationObjectOneOf5 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf5
-     */
-    'gt': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf5
-     */
-    'value': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf6
- */
-export interface ObservationObjectOneOf6 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf6
-     */
-    'lt': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf6
-     */
-    'value': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf7
- */
-export interface ObservationObjectOneOf7 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf7
-     */
-    'le_than': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf7
-     */
-    'value': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ObservationObjectOneOf8
- */
-export interface ObservationObjectOneOf8 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf8
-     */
-    'equal_to': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ObservationObjectOneOf8
-     */
-    'value': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ObservationOneOf
- */
-export interface ObservationOneOf {
+export interface Not {
     /**
      * 
      * @type {Observation}
-     * @memberof ObservationOneOf
-     */
-    'and': Observation;
-    /**
-     * 
-     * @type {Observation}
-     * @memberof ObservationOneOf
-     */
-    'both': Observation;
-}
-/**
- * 
- * @export
- * @interface ObservationOneOf1
- */
-export interface ObservationOneOf1 {
-    /**
-     * 
-     * @type {Observation}
-     * @memberof ObservationOneOf1
-     */
-    'either': Observation;
-    /**
-     * 
-     * @type {Observation}
-     * @memberof ObservationOneOf1
-     */
-    'or': Observation;
-}
-/**
- * 
- * @export
- * @interface ObservationOneOf2
- */
-export interface ObservationOneOf2 {
-    /**
-     * 
-     * @type {Observation}
-     * @memberof ObservationOneOf2
+     * @memberof Not
      */
     'not': Observation;
 }
 /**
  * 
  * @export
- * @interface ObservationOneOf3
+ * @interface NotObject
  */
-export interface ObservationOneOf3 {
+export interface NotObject {
     /**
      * 
-     * @type {ChoiceId}
-     * @memberof ObservationOneOf3
+     * @type {ObservationObject}
+     * @memberof NotObject
      */
-    'chose_something_for': ChoiceId;
+    'not': ObservationObject;
 }
 /**
  * 
  * @export
- * @interface ObservationOneOf4
+ * @interface NotifyAction
  */
-export interface ObservationOneOf4 {
+export interface NotifyAction {
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf4
+     * @type {Observation}
+     * @memberof NotifyAction
      */
-    'ge_than': Value;
-    /**
-     * 
-     * @type {Value}
-     * @memberof ObservationOneOf4
-     */
-    'value': Value;
+    'notify_if': Observation;
 }
 /**
  * 
  * @export
- * @interface ObservationOneOf5
+ * @interface NotifyActionObject
  */
-export interface ObservationOneOf5 {
+export interface NotifyActionObject {
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf5
+     * @type {Observation}
+     * @memberof NotifyActionObject
      */
-    'gt': Value;
+    'notify_if': Observation;
+}
+/**
+ * Notify a contract to check a condition
+ * @export
+ * @enum {string}
+ */
+
+export const NotifyInput = {
+    InputNotify: 'input_notify'
+} as const;
+
+export type NotifyInput = typeof NotifyInput[keyof typeof NotifyInput];
+
+
+/**
+ * @type Observation
+ * A time-varying expression that evaluates to an integer
+ * @export
+ */
+export type Observation = And | ChooseFor | Equal | Greater | GreaterOrEqual | Lesser | LesserOrEqual | Not | Or | boolean;
+
+/**
+ * @type ObservationObject
+ * A time-varying expression that evaluates to an integer
+ * @export
+ */
+export type ObservationObject = AndObject | ChooseForObject | EqualObject | GreaterObject | GreaterOrEqualObject | LabelRef | LesserObject | LesserOrEqualObject | NotObject | OrObject | boolean;
+
+/**
+ * 
+ * @export
+ * @interface Or
+ */
+export interface Or {
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf5
+     * @type {Observation}
+     * @memberof Or
      */
-    'value': Value;
+    'either': Observation;
+    /**
+     * 
+     * @type {Observation}
+     * @memberof Or
+     */
+    'or': Observation;
 }
 /**
  * 
  * @export
- * @interface ObservationOneOf6
+ * @interface OrObject
  */
-export interface ObservationOneOf6 {
+export interface OrObject {
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf6
+     * @type {ObservationObject}
+     * @memberof OrObject
      */
-    'lt': Value;
+    'either': ObservationObject;
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf6
+     * @type {ObservationObject}
+     * @memberof OrObject
      */
-    'value': Value;
+    'or': ObservationObject;
 }
 /**
- * 
+ * A warning for partial payment.
  * @export
- * @interface ObservationOneOf7
+ * @interface PartialPayment
  */
-export interface ObservationOneOf7 {
+export interface PartialPayment {
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf7
+     * @type {Party}
+     * @memberof PartialPayment
      */
-    'le_than': Value;
+    'account': Party;
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf7
+     * @type {number}
+     * @memberof PartialPayment
      */
-    'value': Value;
-}
-/**
- * 
- * @export
- * @interface ObservationOneOf8
- */
-export interface ObservationOneOf8 {
+    'asked_to_pay': number;
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf8
+     * @type {number}
+     * @memberof PartialPayment
      */
-    'equal_to': Value;
+    'but_only_paid': number;
     /**
      * 
-     * @type {Value}
-     * @memberof ObservationOneOf8
+     * @type {Token}
+     * @memberof PartialPayment
      */
-    'value': Value;
+    'of_token': Token;
+    /**
+     * 
+     * @type {Payee}
+     * @memberof PartialPayment
+     */
+    'to_payee': Payee;
 }
 /**
  * @type Party
  * A participant in a contract
  * @export
  */
-export type Party = PartyOneOf | PartyOneOf1;
+export type Party = PartyAddress | PartyRoleName;
 
+/**
+ * Refers to a party by Cardano address.
+ * @export
+ * @interface PartyAddress
+ */
+export interface PartyAddress {
+    /**
+     * A cardano address, in Bech32 format
+     * @type {string}
+     * @memberof PartyAddress
+     */
+    'address': string;
+}
 /**
  * @type PartyObject
  * A participant in a contract
  * @export
  */
-export type PartyObject = ActionObjectOneOf | PartyOneOf | PartyOneOf1;
+export type PartyObject = LabelRef | PartyAddress | PartyRoleName;
 
 /**
  * Refers to a party by role name.
  * @export
- * @interface PartyOneOf
+ * @interface PartyRoleName
  */
-export interface PartyOneOf {
+export interface PartyRoleName {
     /**
      * 
      * @type {string}
-     * @memberof PartyOneOf
+     * @memberof PartyRoleName
      */
     'role_token': string;
 }
 /**
- * Refers to a party by Cardano address.
+ * A payment will be sent from an account to a payee.
  * @export
- * @interface PartyOneOf1
+ * @interface Pay
  */
-export interface PartyOneOf1 {
+export interface Pay {
     /**
-     * A cardano address, in Bech32 format
-     * @type {string}
-     * @memberof PartyOneOf1
+     * 
+     * @type {Party}
+     * @memberof Pay
      */
-    'address': string;
+    'from_account': Party;
+    /**
+     * 
+     * @type {Value}
+     * @memberof Pay
+     */
+    'pay': Value;
+    /**
+     * 
+     * @type {Contract}
+     * @memberof Pay
+     */
+    'then': Contract;
+    /**
+     * 
+     * @type {Payee}
+     * @memberof Pay
+     */
+    'to': Payee;
+    /**
+     * 
+     * @type {Token}
+     * @memberof Pay
+     */
+    'token': Token;
 }
 /**
- * @type Payee
- * A recipient of a payment
+ * A payment will be sent from an account to a payee.
  * @export
+ * @interface PayObject
  */
-export type Payee = PayeeOneOf | PayeeOneOf1;
-
-/**
- * @type PayeeObject
- * A recipient of a payment
- * @export
- */
-export type PayeeObject = PayeeObjectOneOf | PayeeObjectOneOf1;
-
-/**
- * Pays funds into a party\'s account in the contract.
- * @export
- * @interface PayeeObjectOneOf
- */
-export interface PayeeObjectOneOf {
+export interface PayObject {
     /**
      * 
      * @type {PartyObject}
-     * @memberof PayeeObjectOneOf
+     * @memberof PayObject
+     */
+    'from_account': PartyObject;
+    /**
+     * 
+     * @type {ValueObject}
+     * @memberof PayObject
+     */
+    'pay': ValueObject;
+    /**
+     * 
+     * @type {ContractObject}
+     * @memberof PayObject
+     */
+    'then': ContractObject;
+    /**
+     * 
+     * @type {PayeeObject}
+     * @memberof PayObject
+     */
+    'to': PayeeObject;
+    /**
+     * 
+     * @type {TokenObject}
+     * @memberof PayObject
+     */
+    'token': TokenObject;
+}
+/**
+ * Pays funds into a party\'s account in the contract.
+ * @export
+ * @interface PayToAccount
+ */
+export interface PayToAccount {
+    /**
+     * 
+     * @type {Party}
+     * @memberof PayToAccount
+     */
+    'account': Party;
+}
+/**
+ * Pays funds into a party\'s account in the contract.
+ * @export
+ * @interface PayToAccountObject
+ */
+export interface PayToAccountObject {
+    /**
+     * 
+     * @type {PartyObject}
+     * @memberof PayToAccountObject
      */
     'account': PartyObject;
 }
 /**
  * Pays funds to a party.
  * @export
- * @interface PayeeObjectOneOf1
+ * @interface PayToParty
  */
-export interface PayeeObjectOneOf1 {
-    /**
-     * 
-     * @type {PartyObject}
-     * @memberof PayeeObjectOneOf1
-     */
-    'party': PartyObject;
-}
-/**
- * Pays funds into a party\'s account in the contract.
- * @export
- * @interface PayeeOneOf
- */
-export interface PayeeOneOf {
+export interface PayToParty {
     /**
      * 
      * @type {Party}
-     * @memberof PayeeOneOf
+     * @memberof PayToParty
      */
-    'account': Party;
+    'party': Party;
 }
 /**
  * Pays funds to a party.
  * @export
- * @interface PayeeOneOf1
+ * @interface PayToPartyObject
  */
-export interface PayeeOneOf1 {
+export interface PayToPartyObject {
     /**
      * 
-     * @type {Party}
-     * @memberof PayeeOneOf1
+     * @type {PartyObject}
+     * @memberof PayToPartyObject
      */
-    'party': Party;
+    'party': PartyObject;
 }
+/**
+ * @type Payee
+ * A recipient of a payment
+ * @export
+ */
+export type Payee = PayToAccount | PayToParty;
+
+/**
+ * @type PayeeObject
+ * A recipient of a payment
+ * @export
+ */
+export type PayeeObject = PayToAccountObject | PayToPartyObject;
+
 /**
  * A Marlowe payment.
  * @export
@@ -2310,67 +2773,15 @@ export interface PlutusAddress {
  * A Plutus credential.
  * @export
  */
-export type PlutusCredential = PlutusCredentialOneOf | PlutusCredentialOneOf1;
+export type PlutusCredential = PubKeyCredential | ScriptCredential;
 
-/**
- * A Plutus public key credential.
- * @export
- * @interface PlutusCredentialOneOf
- */
-export interface PlutusCredentialOneOf {
-    /**
-     * 
-     * @type {string}
-     * @memberof PlutusCredentialOneOf
-     */
-    'pubKeyCredential': string;
-}
-/**
- * A Plutus script credential.
- * @export
- * @interface PlutusCredentialOneOf1
- */
-export interface PlutusCredentialOneOf1 {
-    /**
-     * 
-     * @type {string}
-     * @memberof PlutusCredentialOneOf1
-     */
-    'scriptCredential': string;
-}
 /**
  * @type PlutusStakingCredential
  * A Plutus staking credential.
  * @export
  */
-export type PlutusStakingCredential = PlutusStakingCredentialOneOf | PlutusStakingCredentialOneOf1;
+export type PlutusStakingCredential = StakingHash | StakingPointer;
 
-/**
- * A Plutus staking hash.
- * @export
- * @interface PlutusStakingCredentialOneOf
- */
-export interface PlutusStakingCredentialOneOf {
-    /**
-     * 
-     * @type {PlutusCredential}
-     * @memberof PlutusStakingCredentialOneOf
-     */
-    'stakingHash': PlutusCredential;
-}
-/**
- * A Plutus staking pointer.
- * @export
- * @interface PlutusStakingCredentialOneOf1
- */
-export interface PlutusStakingCredentialOneOf1 {
-    /**
-     * 
-     * @type {Array<number>}
-     * @memberof PlutusStakingCredentialOneOf1
-     */
-    'stakingHash': Array<number>;
-}
 /**
  * 
  * @export
@@ -2404,10 +2815,10 @@ export interface PostContractsRequest {
     'contract': PostContractsRequestContract;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof PostContractsRequest
      */
-    'metadata': { [key: string]: any | undefined; };
+    'metadata': { [key: string]: Metadata | undefined; };
     /**
      * 
      * @type {number}
@@ -2422,10 +2833,16 @@ export interface PostContractsRequest {
     'roles'?: RolesConfig;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof PostContractsRequest
      */
-    'tags': { [key: string]: any | undefined; };
+    'tags': { [key: string]: Metadata | undefined; };
+    /**
+     * 
+     * @type {string}
+     * @memberof PostContractsRequest
+     */
+    'threadTokenName'?: string;
     /**
      * 
      * @type {MarloweVersion}
@@ -2467,16 +2884,16 @@ export interface PostTransactionsRequest {
     'invalidHereafter'?: string;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof PostTransactionsRequest
      */
-    'metadata': { [key: string]: any | undefined; };
+    'metadata': { [key: string]: Metadata | undefined; };
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof PostTransactionsRequest
      */
-    'tags': { [key: string]: any | undefined; };
+    'tags': { [key: string]: Metadata | undefined; };
     /**
      * 
      * @type {MarloweVersion}
@@ -2500,56 +2917,23 @@ export interface PostWithdrawalsRequest {
     'payouts': Set<string>;
 }
 /**
+ * A Plutus public key credential.
+ * @export
+ * @interface PubKeyCredential
+ */
+export interface PubKeyCredential {
+    /**
+     * 
+     * @type {string}
+     * @memberof PubKeyCredential
+     */
+    'pubKeyCredential': string;
+}
+/**
  * @type RoleTokenConfig
  * @export
  */
-export type RoleTokenConfig = RoleTokenConfigOneOf | RoleTokenConfigOneOf1 | string;
-
-/**
- * 
- * @export
- * @interface RoleTokenConfigOneOf
- */
-export interface RoleTokenConfigOneOf {
-    /**
-     * A cardano address, in Bech32 format
-     * @type {string}
-     * @memberof RoleTokenConfigOneOf
-     */
-    'address': string;
-    /**
-     * 
-     * @type {TokenMetadata}
-     * @memberof RoleTokenConfigOneOf
-     */
-    'metadata': TokenMetadata;
-}
-/**
- * 
- * @export
- * @interface RoleTokenConfigOneOf1
- */
-export interface RoleTokenConfigOneOf1 {
-    /**
-     * 
-     * @type {TokenMetadata}
-     * @memberof RoleTokenConfigOneOf1
-     */
-    'metadata'?: TokenMetadata;
-    /**
-     * The type of script receiving the role token.
-     * @type {string}
-     * @memberof RoleTokenConfigOneOf1
-     */
-    'script': RoleTokenConfigOneOf1ScriptEnum;
-}
-
-export const RoleTokenConfigOneOf1ScriptEnum = {
-    ThreadRole: 'ThreadRole',
-    OpenRole: 'OpenRole'
-} as const;
-
-export type RoleTokenConfigOneOf1ScriptEnum = typeof RoleTokenConfigOneOf1ScriptEnum[keyof typeof RoleTokenConfigOneOf1ScriptEnum];
+export type RoleTokenConfig = AddressAndMetadata | MetadataAndRecipients | MetadataAndScript | string;
 
 /**
  * @type RolesConfig
@@ -2667,6 +3051,45 @@ export interface SafetyError {
     'warning'?: TransactionWarning;
 }
 /**
+ * A Plutus script credential.
+ * @export
+ * @interface ScriptCredential
+ */
+export interface ScriptCredential {
+    /**
+     * 
+     * @type {string}
+     * @memberof ScriptCredential
+     */
+    'scriptCredential': string;
+}
+/**
+ * A Plutus staking hash.
+ * @export
+ * @interface StakingHash
+ */
+export interface StakingHash {
+    /**
+     * 
+     * @type {PlutusCredential}
+     * @memberof StakingHash
+     */
+    'stakingHash': PlutusCredential;
+}
+/**
+ * A Plutus staking pointer.
+ * @export
+ * @interface StakingPointer
+ */
+export interface StakingPointer {
+    /**
+     * 
+     * @type {Array<number>}
+     * @memberof StakingPointer
+     */
+    'stakingHash': Array<number>;
+}
+/**
  * 
  * @export
  * @interface TextEnvelope
@@ -2692,6 +3115,20 @@ export interface TextEnvelope {
     'type': string;
 }
 /**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const TimeInterval = {
+    Start: 'time_interval_start',
+    End: 'time_interval_end'
+} as const;
+
+export type TimeInterval = typeof TimeInterval[keyof typeof TimeInterval];
+
+
+/**
  * A token with a currency symbol (minting policy ID) and token name.
  * @export
  * @interface Token
@@ -2711,11 +3148,51 @@ export interface Token {
     'token_name': string;
 }
 /**
+ * 
+ * @export
+ * @interface TokenInAccount
+ */
+export interface TokenInAccount {
+    /**
+     * 
+     * @type {Token}
+     * @memberof TokenInAccount
+     */
+    'amount_of_token': Token;
+    /**
+     * 
+     * @type {Party}
+     * @memberof TokenInAccount
+     */
+    'in_account': Party;
+}
+/**
+ * 
+ * @export
+ * @interface TokenInAccountObject
+ */
+export interface TokenInAccountObject {
+    /**
+     * 
+     * @type {TokenObject}
+     * @memberof TokenInAccountObject
+     */
+    'amount_of_token': TokenObject;
+    /**
+     * 
+     * @type {PartyObject}
+     * @memberof TokenInAccountObject
+     */
+    'in_account': PartyObject;
+}
+/**
  * Metadata for an NFT, as described by https://cips.cardano.org/cips/cip25/
  * @export
  * @interface TokenMetadata
  */
 export interface TokenMetadata {
+    [key: string]: Metadata;
+
     /**
      * 
      * @type {string}
@@ -2753,6 +3230,8 @@ export interface TokenMetadata {
  * @interface TokenMetadataFile
  */
 export interface TokenMetadataFile {
+    [key: string]: Metadata;
+
     /**
      * 
      * @type {string}
@@ -2777,7 +3256,7 @@ export interface TokenMetadataFile {
  * A token with a currency symbol (minting policy ID) and token name.
  * @export
  */
-export type TokenObject = ActionObjectOneOf | Token;
+export type TokenObject = LabelRef | Token;
 
 /**
  * Information about a Marlowe transaction.
@@ -2886,183 +3365,15 @@ export interface TransactionInputTxInterval {
  * Marlowe transaction output.
  * @export
  */
-export type TransactionOutput = TransactionOutputOneOf | TransactionOutputOneOf1;
+export type TransactionOutput = TxOutputError | TxOutputSuccess;
 
-/**
- * Marlowe transaction output information.
- * @export
- * @interface TransactionOutputOneOf
- */
-export interface TransactionOutputOneOf {
-    /**
-     * 
-     * @type {Contract}
-     * @memberof TransactionOutputOneOf
-     */
-    'contract': Contract;
-    /**
-     * 
-     * @type {Array<Payment>}
-     * @memberof TransactionOutputOneOf
-     */
-    'payments': Array<Payment>;
-    /**
-     * 
-     * @type {MarloweState}
-     * @memberof TransactionOutputOneOf
-     */
-    'state': MarloweState;
-    /**
-     * 
-     * @type {Array<TransactionWarning>}
-     * @memberof TransactionOutputOneOf
-     */
-    'warnings': Array<TransactionWarning>;
-}
-/**
- * Marlowe transaction error.
- * @export
- * @interface TransactionOutputOneOf1
- */
-export interface TransactionOutputOneOf1 {
-    /**
-     * 
-     * @type {TransactionError}
-     * @memberof TransactionOutputOneOf1
-     */
-    'transaction_error': TransactionError;
-}
 /**
  * @type TransactionWarning
  * A transaction semantics warning.
  * @export
  */
-export type TransactionWarning = TransactionWarningOneOf | TransactionWarningOneOf1 | TransactionWarningOneOf2 | TransactionWarningOneOf3 | string;
+export type TransactionWarning = AssertFail | NonPositiveDeposit | NonPositivePayment | PartialPayment | VariableShadowing;
 
-/**
- * A warning for a non-positive deposit.
- * @export
- * @interface TransactionWarningOneOf
- */
-export interface TransactionWarningOneOf {
-    /**
-     * 
-     * @type {number}
-     * @memberof TransactionWarningOneOf
-     */
-    'asked_to_deposit': number;
-    /**
-     * 
-     * @type {Party}
-     * @memberof TransactionWarningOneOf
-     */
-    'in_account': Party;
-    /**
-     * 
-     * @type {Token}
-     * @memberof TransactionWarningOneOf
-     */
-    'of_token': Token;
-    /**
-     * 
-     * @type {Party}
-     * @memberof TransactionWarningOneOf
-     */
-    'party': Party;
-}
-/**
- * A warning for a non-positive payment.
- * @export
- * @interface TransactionWarningOneOf1
- */
-export interface TransactionWarningOneOf1 {
-    /**
-     * 
-     * @type {Party}
-     * @memberof TransactionWarningOneOf1
-     */
-    'account': Party;
-    /**
-     * 
-     * @type {number}
-     * @memberof TransactionWarningOneOf1
-     */
-    'asked_to_pay': number;
-    /**
-     * 
-     * @type {Token}
-     * @memberof TransactionWarningOneOf1
-     */
-    'of_token': Token;
-    /**
-     * 
-     * @type {Payee}
-     * @memberof TransactionWarningOneOf1
-     */
-    'to_payee': Payee;
-}
-/**
- * A warning for partial payment.
- * @export
- * @interface TransactionWarningOneOf2
- */
-export interface TransactionWarningOneOf2 {
-    /**
-     * 
-     * @type {Party}
-     * @memberof TransactionWarningOneOf2
-     */
-    'account': Party;
-    /**
-     * 
-     * @type {number}
-     * @memberof TransactionWarningOneOf2
-     */
-    'asked_to_pay': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof TransactionWarningOneOf2
-     */
-    'but_only_paid': number;
-    /**
-     * 
-     * @type {Token}
-     * @memberof TransactionWarningOneOf2
-     */
-    'of_token': Token;
-    /**
-     * 
-     * @type {Payee}
-     * @memberof TransactionWarningOneOf2
-     */
-    'to_payee': Payee;
-}
-/**
- * A variable-name shadowing warning.
- * @export
- * @interface TransactionWarningOneOf3
- */
-export interface TransactionWarningOneOf3 {
-    /**
-     * 
-     * @type {number}
-     * @memberof TransactionWarningOneOf3
-     */
-    'had_value': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof TransactionWarningOneOf3
-     */
-    'is_now_assigned': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactionWarningOneOf3
-     */
-    'value_id': string;
-}
 /**
  * 
  * @export
@@ -3100,17 +3411,17 @@ export interface Tx {
      */
     'contractId': string;
     /**
-     * A reference to a transaction output with a transaction ID and index.
-     * @type {string}
-     * @memberof Tx
-     */
-    'inputUtxo': string;
-    /**
      * 
      * @type {Array<Input>}
      * @memberof Tx
      */
     'inputs': Array<Input>;
+    /**
+     * A reference to a transaction output with a transaction ID and index.
+     * @type {string}
+     * @memberof Tx
+     */
+    'inputUtxo': string;
     /**
      * 
      * @type {string}
@@ -3125,10 +3436,10 @@ export interface Tx {
     'invalidHereafter': string;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof Tx
      */
-    'metadata': { [key: string]: any | undefined; };
+    'metadata': { [key: string]: Metadata | undefined; };
     /**
      * 
      * @type {Contract}
@@ -3161,10 +3472,10 @@ export interface Tx {
     'status': TxStatus;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof Tx
      */
-    'tags': { [key: string]: any | undefined; };
+    'tags': { [key: string]: Metadata | undefined; };
     /**
      * The hex-encoded identifier of a Cardano transaction
      * @type {string}
@@ -3206,10 +3517,10 @@ export interface TxHeader {
     'contractId': string;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof TxHeader
      */
-    'metadata': { [key: string]: any | undefined; };
+    'metadata': { [key: string]: Metadata | undefined; };
     /**
      * 
      * @type {TxStatus}
@@ -3218,10 +3529,10 @@ export interface TxHeader {
     'status': TxStatus;
     /**
      * 
-     * @type {{ [key: string]: any | undefined; }}
+     * @type {{ [key: string]: Metadata | undefined; }}
      * @memberof TxHeader
      */
-    'tags': { [key: string]: any | undefined; };
+    'tags': { [key: string]: Metadata | undefined; };
     /**
      * The hex-encoded identifier of a Cardano transaction
      * @type {string}
@@ -3238,6 +3549,50 @@ export interface TxHeader {
 
 
 /**
+ * Marlowe transaction error.
+ * @export
+ * @interface TxOutputError
+ */
+export interface TxOutputError {
+    /**
+     * 
+     * @type {TransactionError}
+     * @memberof TxOutputError
+     */
+    'transaction_error': TransactionError;
+}
+/**
+ * Marlowe transaction output information.
+ * @export
+ * @interface TxOutputSuccess
+ */
+export interface TxOutputSuccess {
+    /**
+     * 
+     * @type {Contract}
+     * @memberof TxOutputSuccess
+     */
+    'contract': Contract;
+    /**
+     * 
+     * @type {Array<Payment>}
+     * @memberof TxOutputSuccess
+     */
+    'payments': Array<Payment>;
+    /**
+     * 
+     * @type {MarloweState}
+     * @memberof TxOutputSuccess
+     */
+    'state': MarloweState;
+    /**
+     * 
+     * @type {Array<TransactionWarning>}
+     * @memberof TxOutputSuccess
+     */
+    'warnings': Array<TransactionWarning>;
+}
+/**
  * The status of a transaction on the local node.
  * @export
  * @enum {string}
@@ -3253,323 +3608,132 @@ export type TxStatus = typeof TxStatus[keyof typeof TxStatus];
 
 
 /**
+ * 
+ * @export
+ * @interface UseValue
+ */
+export interface UseValue {
+    /**
+     * 
+     * @type {string}
+     * @memberof UseValue
+     */
+    'use_value': string;
+}
+/**
  * @type Value
  * A time-varying expression that evaluates to a boolean
  * @export
  */
-export type Value = ValueOneOf | ValueOneOf1 | ValueOneOf2 | ValueOneOf3 | ValueOneOf4 | ValueOneOf5 | ValueOneOf6 | ValueOneOf7 | ValueOneOf8 | number | string;
+export type Value = Add | Divide | IfValue | Minus | Multiply | Negate | TimeInterval | TokenInAccount | UseValue | ValueOfChoice | number;
 
 /**
  * @type ValueObject
  * A time-varying expression that evaluates to a boolean
  * @export
  */
-export type ValueObject = ActionObjectOneOf | ValueObjectOneOf | ValueObjectOneOf1 | ValueObjectOneOf2 | ValueObjectOneOf3 | ValueObjectOneOf4 | ValueObjectOneOf5 | ValueObjectOneOf6 | ValueObjectOneOf7 | ValueOneOf7 | number | string;
+export type ValueObject = AddObject | DivideObject | IfValueObject | LabelRef | MinusObject | MultiplyObject | NegateObject | TimeInterval | TokenInAccountObject | UseValue | ValueOfChoiceObject | number;
 
 /**
  * 
  * @export
- * @interface ValueObjectOneOf
+ * @interface ValueOfChoice
  */
-export interface ValueObjectOneOf {
-    /**
-     * 
-     * @type {TokenObject}
-     * @memberof ValueObjectOneOf
-     */
-    'amount_of_token': TokenObject;
-    /**
-     * 
-     * @type {PartyObject}
-     * @memberof ValueObjectOneOf
-     */
-    'in_account': PartyObject;
-}
-/**
- * 
- * @export
- * @interface ValueObjectOneOf1
- */
-export interface ValueObjectOneOf1 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf1
-     */
-    'negate': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ValueObjectOneOf2
- */
-export interface ValueObjectOneOf2 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf2
-     */
-    'add': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf2
-     */
-    'and': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ValueObjectOneOf3
- */
-export interface ValueObjectOneOf3 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf3
-     */
-    'minus': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf3
-     */
-    'value': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ValueObjectOneOf4
- */
-export interface ValueObjectOneOf4 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf4
-     */
-    'multiply': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf4
-     */
-    'times': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ValueObjectOneOf5
- */
-export interface ValueObjectOneOf5 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf5
-     */
-    'by': ValueObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf5
-     */
-    'divide': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ValueObjectOneOf6
- */
-export interface ValueObjectOneOf6 {
-    /**
-     * 
-     * @type {ChoiceIdObject}
-     * @memberof ValueObjectOneOf6
-     */
-    'value_of_choice': ChoiceIdObject;
-}
-/**
- * 
- * @export
- * @interface ValueObjectOneOf7
- */
-export interface ValueObjectOneOf7 {
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf7
-     */
-    'else': ValueObject;
-    /**
-     * 
-     * @type {ObservationObject}
-     * @memberof ValueObjectOneOf7
-     */
-    'if': ObservationObject;
-    /**
-     * 
-     * @type {ValueObject}
-     * @memberof ValueObjectOneOf7
-     */
-    'then': ValueObject;
-}
-/**
- * 
- * @export
- * @interface ValueOneOf
- */
-export interface ValueOneOf {
-    /**
-     * 
-     * @type {Token}
-     * @memberof ValueOneOf
-     */
-    'amount_of_token': Token;
-    /**
-     * 
-     * @type {Party}
-     * @memberof ValueOneOf
-     */
-    'in_account': Party;
-}
-/**
- * 
- * @export
- * @interface ValueOneOf1
- */
-export interface ValueOneOf1 {
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf1
-     */
-    'negate': Value;
-}
-/**
- * 
- * @export
- * @interface ValueOneOf2
- */
-export interface ValueOneOf2 {
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf2
-     */
-    'add': Value;
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf2
-     */
-    'and': Value;
-}
-/**
- * 
- * @export
- * @interface ValueOneOf3
- */
-export interface ValueOneOf3 {
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf3
-     */
-    'minus': Value;
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf3
-     */
-    'value': Value;
-}
-/**
- * 
- * @export
- * @interface ValueOneOf4
- */
-export interface ValueOneOf4 {
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf4
-     */
-    'multiply': Value;
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf4
-     */
-    'times': Value;
-}
-/**
- * 
- * @export
- * @interface ValueOneOf5
- */
-export interface ValueOneOf5 {
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf5
-     */
-    'by': Value;
-    /**
-     * 
-     * @type {Value}
-     * @memberof ValueOneOf5
-     */
-    'divide': Value;
-}
-/**
- * 
- * @export
- * @interface ValueOneOf6
- */
-export interface ValueOneOf6 {
+export interface ValueOfChoice {
     /**
      * 
      * @type {ChoiceId}
-     * @memberof ValueOneOf6
+     * @memberof ValueOfChoice
      */
     'value_of_choice': ChoiceId;
 }
 /**
  * 
  * @export
- * @interface ValueOneOf7
+ * @interface ValueOfChoiceObject
  */
-export interface ValueOneOf7 {
+export interface ValueOfChoiceObject {
+    /**
+     * 
+     * @type {ChoiceIdObject}
+     * @memberof ValueOfChoiceObject
+     */
+    'value_of_choice': ChoiceIdObject;
+}
+/**
+ * A variable-name shadowing warning.
+ * @export
+ * @interface VariableShadowing
+ */
+export interface VariableShadowing {
+    /**
+     * 
+     * @type {number}
+     * @memberof VariableShadowing
+     */
+    'had_value': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VariableShadowing
+     */
+    'is_now_assigned': number;
     /**
      * 
      * @type {string}
-     * @memberof ValueOneOf7
+     * @memberof VariableShadowing
      */
-    'use_value': string;
+    'value_id': string;
 }
 /**
- * 
+ * Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.
  * @export
- * @interface ValueOneOf8
+ * @interface When
  */
-export interface ValueOneOf8 {
+export interface When {
     /**
      * 
-     * @type {Value}
-     * @memberof ValueOneOf8
+     * @type {number}
+     * @memberof When
      */
-    'else': Value;
+    'timeout': number;
     /**
      * 
-     * @type {Observation}
-     * @memberof ValueOneOf8
+     * @type {Contract}
+     * @memberof When
      */
-    'if': Observation;
+    'timeout_continuation': Contract;
     /**
      * 
-     * @type {Value}
-     * @memberof ValueOneOf8
+     * @type {Array<Case>}
+     * @memberof When
      */
-    'then': Value;
+    'when': Array<Case>;
+}
+/**
+ * Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.
+ * @export
+ * @interface WhenObject
+ */
+export interface WhenObject {
+    /**
+     * 
+     * @type {number}
+     * @memberof WhenObject
+     */
+    'timeout': number;
+    /**
+     * 
+     * @type {ContractObject}
+     * @memberof WhenObject
+     */
+    'timeout_continuation': ContractObject;
+    /**
+     * 
+     * @type {Array<CaseObject>}
+     * @memberof WhenObject
+     */
+    'when': Array<CaseObject>;
 }
 /**
  * 
