@@ -1,50 +1,32 @@
 {
   "components": {
     "schemas": {
+      "AccountTokenTuple": {
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/Party"
+            },
+            {
+              "$ref": "#/components/schemas/Token"
+            }
+          ]
+        },
+        "maxItems": 2,
+        "minItems": 2,
+        "type": "array"
+      },
       "Action": {
         "description": "A contract which becomes active when an action occurs.",
         "oneOf": [
           {
-            "properties": {
-              "deposits": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "into_account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "party": {
-                "$ref": "#/components/schemas/Party"
-              }
-            },
-            "required": ["party", "deposits", "of_token", "into_account"],
-            "type": "object"
+            "$ref": "#/components/schemas/DepositAction"
           },
           {
-            "properties": {
-              "choose_between": {
-                "items": {
-                  "$ref": "#/components/schemas/Bound"
-                },
-                "type": "array"
-              },
-              "for_choice": {
-                "$ref": "#/components/schemas/ChoiceId"
-              }
-            },
-            "required": ["for_choice", "choose_between"],
-            "type": "object"
+            "$ref": "#/components/schemas/ChoiceAction"
           },
           {
-            "properties": {
-              "notify_if": {
-                "$ref": "#/components/schemas/Observation"
-              }
-            },
-            "required": ["notify_if"],
-            "type": "object"
+            "$ref": "#/components/schemas/NotifyAction"
           }
         ]
       },
@@ -52,62 +34,96 @@
         "description": "A contract which becomes active when an action occurs.",
         "oneOf": [
           {
-            "properties": {
-              "deposits": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "into_account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "party": {
-                "$ref": "#/components/schemas/Party"
-              }
-            },
-            "required": ["party", "deposits", "of_token", "into_account"],
-            "type": "object"
+            "$ref": "#/components/schemas/DepositActionObject"
           },
           {
-            "properties": {
-              "choose_between": {
-                "items": {
-                  "$ref": "#/components/schemas/Bound"
-                },
-                "type": "array"
-              },
-              "for_choice": {
-                "$ref": "#/components/schemas/ChoiceId"
-              }
-            },
-            "required": ["for_choice", "choose_between"],
-            "type": "object"
+            "$ref": "#/components/schemas/ChoiceActionObject"
           },
           {
-            "properties": {
-              "notify_if": {
-                "$ref": "#/components/schemas/Observation"
-              }
-            },
-            "required": ["notify_if"],
-            "type": "object"
+            "$ref": "#/components/schemas/NotifyActionObject"
           },
           {
-            "properties": {
-              "ref": {
-                "$ref": "#/components/schemas/Label"
-              }
-            },
-            "required": ["ref"],
-            "type": "object"
+            "$ref": "#/components/schemas/LabelRef"
           }
         ]
+      },
+      "Add": {
+        "properties": {
+          "add": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "and": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["add", "and"],
+        "type": "object"
+      },
+      "AdditionalMetadata": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Metadata"
+        },
+        "description": "Object of metadata values",
+        "type": "object"
+      },
+      "AdditionalRolesConfigProp": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/RoleTokenConfig"
+        },
+        "type": "object"
+      },
+      "AddObject": {
+        "properties": {
+          "add": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "and": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["add", "and"],
+        "type": "object"
       },
       "Address": {
         "description": "A cardano address, in Bech32 format",
         "example": "addr1w94f8ywk4fg672xasahtk4t9k6w3aql943uxz5rt62d4dvq8evxaf",
         "type": "string"
+      },
+      "AddressAndMetadata": {
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/TokenMetadata"
+          }
+        },
+        "required": ["address"],
+        "type": "object"
+      },
+      "And": {
+        "properties": {
+          "and": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "both": {
+            "$ref": "#/components/schemas/Observation"
+          }
+        },
+        "required": ["both", "and"],
+        "type": "object"
+      },
+      "AndObject": {
+        "properties": {
+          "and": {
+            "$ref": "#/components/schemas/ObservationObject"
+          },
+          "both": {
+            "$ref": "#/components/schemas/ObservationObject"
+          }
+        },
+        "required": ["both", "and"],
+        "type": "object"
       },
       "ApplicableInputs": {
         "description": "Applicable Inputs for a given contract",
@@ -164,6 +180,37 @@
         "required": ["contractId", "transactionId", "tx"],
         "type": "object"
       },
+      "Assert": {
+        "description": "Check an observation and produce a warning if it is false.",
+        "properties": {
+          "assert": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "then": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        },
+        "required": ["assert", "then"],
+        "type": "object"
+      },
+      "AssertFail": {
+        "description": "A semantics assertion failed.",
+        "enum": ["assertion_failed"],
+        "type": "string"
+      },
+      "AssertObject": {
+        "description": "Check an observation and produce a warning if it is false.",
+        "properties": {
+          "assert": {
+            "$ref": "#/components/schemas/ObservationObject"
+          },
+          "then": {
+            "$ref": "#/components/schemas/ContractObject"
+          }
+        },
+        "required": ["assert", "then"],
+        "type": "object"
+      },
       "AssetId": {
         "properties": {
           "assetName": {
@@ -201,13 +248,13 @@
           },
           "blockNo": {
             "format": "int64",
-            "maximum": 9223372036854775807,
+            "maximum": 1.8446744073709551615e19,
             "minimum": 0,
             "type": "integer"
           },
           "slotNo": {
             "format": "int64",
-            "maximum": 9223372036854775807,
+            "maximum": 1.8446744073709551615e19,
             "minimum": 0,
             "type": "integer"
           }
@@ -308,28 +355,10 @@
         "description": "A contract which becomes active when an action occurs.",
         "oneOf": [
           {
-            "properties": {
-              "case": {
-                "$ref": "#/components/schemas/Action"
-              },
-              "then": {
-                "$ref": "#/components/schemas/Contract"
-              }
-            },
-            "required": ["case", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/CaseThen"
           },
           {
-            "properties": {
-              "case": {
-                "$ref": "#/components/schemas/Action"
-              },
-              "merkleized_then": {
-                "type": "string"
-              }
-            },
-            "required": ["case", "merkleized_then"],
-            "type": "object"
+            "$ref": "#/components/schemas/CaseMerkleizedThen"
           }
         ]
       },
@@ -337,34 +366,118 @@
         "description": "Index of a \"Case Action\" in a \"When\"",
         "type": "integer"
       },
+      "CaseMerkleizedThen": {
+        "properties": {
+          "case": {
+            "$ref": "#/components/schemas/Action"
+          },
+          "merkleized_then": {
+            "type": "string"
+          }
+        },
+        "required": ["case", "merkleized_then"],
+        "type": "object"
+      },
+      "CaseMerkleizedThenObject": {
+        "properties": {
+          "case": {
+            "$ref": "#/components/schemas/ActionObject"
+          },
+          "merkleized_then": {
+            "type": "string"
+          }
+        },
+        "required": ["case", "merkleized_then"],
+        "type": "object"
+      },
       "CaseObject": {
         "description": "A contract which becomes active when an action occurs.",
         "oneOf": [
           {
-            "properties": {
-              "case": {
-                "$ref": "#/components/schemas/ActionObject"
-              },
-              "then": {
-                "$ref": "#/components/schemas/ContractObject"
-              }
-            },
-            "required": ["case", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/CaseThenObject"
           },
           {
-            "properties": {
-              "case": {
-                "$ref": "#/components/schemas/ActionObject"
-              },
-              "merkleized_then": {
-                "type": "string"
-              }
-            },
-            "required": ["case", "merkleized_then"],
-            "type": "object"
+            "$ref": "#/components/schemas/CaseMerkleizedThenObject"
           }
         ]
+      },
+      "CaseThen": {
+        "properties": {
+          "case": {
+            "$ref": "#/components/schemas/Action"
+          },
+          "then": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        },
+        "required": ["case", "then"],
+        "type": "object"
+      },
+      "CaseThenObject": {
+        "properties": {
+          "case": {
+            "$ref": "#/components/schemas/ActionObject"
+          },
+          "then": {
+            "$ref": "#/components/schemas/ContractObject"
+          }
+        },
+        "required": ["case", "then"],
+        "type": "object"
+      },
+      "ChoiceAction": {
+        "properties": {
+          "choose_between": {
+            "items": {
+              "$ref": "#/components/schemas/Bound"
+            },
+            "type": "array"
+          },
+          "for_choice": {
+            "$ref": "#/components/schemas/ChoiceId"
+          }
+        },
+        "required": ["for_choice", "choose_between"],
+        "type": "object"
+      },
+      "ChoiceActionObject": {
+        "properties": {
+          "choose_between": {
+            "items": {
+              "$ref": "#/components/schemas/Bound"
+            },
+            "type": "array"
+          },
+          "for_choice": {
+            "$ref": "#/components/schemas/ChoiceId"
+          }
+        },
+        "required": ["for_choice", "choose_between"],
+        "type": "object"
+      },
+      "ChoiceContinuationInput": {
+        "description": "Make a choice in a contract and provide the continuation of the contract",
+        "properties": {
+          "continuation_hash": {
+            "type": "string"
+          },
+          "for_choice_id": {
+            "$ref": "#/components/schemas/ChoiceId"
+          },
+          "input_that_chooses_num": {
+            "type": "integer"
+          },
+          "merkleized_continuation": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        },
+        "required": [
+          "input_that_chooses_num",
+          "for_choice_id",
+          "merkleized_continuation",
+          "continuation_hash"
+        ],
+        "type": "object"
       },
       "ChoiceId": {
         "description": "Refers to a party by role name.",
@@ -392,99 +505,80 @@
         "required": ["choice_name", "choice_owner"],
         "type": "object"
       },
+      "ChoiceInput": {
+        "description": "Make a choice in a contract",
+        "properties": {
+          "for_choice_id": {
+            "$ref": "#/components/schemas/ChoiceId"
+          },
+          "input_that_chooses_num": {
+            "type": "integer"
+          }
+        },
+        "required": ["input_that_chooses_num", "for_choice_id"],
+        "type": "object"
+      },
+      "ChooseFor": {
+        "properties": {
+          "chose_something_for": {
+            "$ref": "#/components/schemas/ChoiceId"
+          }
+        },
+        "required": ["chose_something_for"],
+        "type": "object"
+      },
+      "ChooseForObject": {
+        "properties": {
+          "chose_something_for": {
+            "$ref": "#/components/schemas/ChoiceIdObject"
+          }
+        },
+        "required": ["chose_something_for"],
+        "type": "object"
+      },
+      "Close": {
+        "description": "No more payments will be sent and the balance of the contract is 0.",
+        "enum": ["close"],
+        "type": "string"
+      },
+      "CloseObject": {
+        "description": "No more payments will be sent and the balance of the contract is 0.",
+        "enum": ["close"],
+        "type": "string"
+      },
+      "ContinuationInput": {
+        "description": "Notify a contract to check a condition and provide the continuation of the contract",
+        "properties": {
+          "continuation_hash": {
+            "type": "string"
+          },
+          "merkleized_continuation": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        },
+        "required": ["merkleized_continuation", "continuation_hash"],
+        "type": "object"
+      },
       "Contract": {
         "description": "Contract terms specified in Marlowe",
         "oneOf": [
           {
-            "description": "No more payments will be sent and the balance of the contract is 0.",
-            "enum": ["close"],
-            "type": "string"
+            "$ref": "#/components/schemas/Close"
           },
           {
-            "description": "A payment will be sent from an account to a payee.",
-            "properties": {
-              "from_account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "pay": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "then": {
-                "$ref": "#/components/schemas/Contract"
-              },
-              "to": {
-                "$ref": "#/components/schemas/Payee"
-              },
-              "token": {
-                "$ref": "#/components/schemas/Token"
-              }
-            },
-            "required": ["from_account", "to", "token", "pay", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/Pay"
           },
           {
-            "description": "If an observation is true, the first contract applies, otherwise the second contract applies.",
-            "properties": {
-              "else": {
-                "$ref": "#/components/schemas/Contract"
-              },
-              "if": {
-                "$ref": "#/components/schemas/Observation"
-              },
-              "then": {
-                "$ref": "#/components/schemas/Contract"
-              }
-            },
-            "required": ["if", "then", "else"],
-            "type": "object"
+            "$ref": "#/components/schemas/If"
           },
           {
-            "description": "Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.",
-            "properties": {
-              "timeout": {
-                "type": "integer"
-              },
-              "timeout_continuation": {
-                "$ref": "#/components/schemas/Contract"
-              },
-              "when": {
-                "items": {
-                  "$ref": "#/components/schemas/Case"
-                },
-                "type": "array"
-              }
-            },
-            "required": ["when", "timeout", "timeout_continuation"],
-            "type": "object"
+            "$ref": "#/components/schemas/When"
           },
           {
-            "description": "Bind a value to a name within the scope of a sub-contract.",
-            "properties": {
-              "be": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "let": {
-                "type": "string"
-              },
-              "then": {
-                "$ref": "#/components/schemas/Contract"
-              }
-            },
-            "required": ["let", "be", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/Let"
           },
           {
-            "description": "Check an observation and produce a warning if it is false.",
-            "properties": {
-              "assert": {
-                "$ref": "#/components/schemas/Observation"
-              },
-              "then": {
-                "$ref": "#/components/schemas/Contract"
-              }
-            },
-            "required": ["assert", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/Assert"
           }
         ]
       },
@@ -535,104 +629,25 @@
         "description": "Contract terms specified in Marlowe",
         "oneOf": [
           {
-            "description": "No more payments will be sent and the balance of the contract is 0.",
-            "enum": ["close"],
-            "type": "string"
+            "$ref": "#/components/schemas/CloseObject"
           },
           {
-            "description": "A payment will be sent from an account to a payee.",
-            "properties": {
-              "from_account": {
-                "$ref": "#/components/schemas/PartyObject"
-              },
-              "pay": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "then": {
-                "$ref": "#/components/schemas/ContractObject"
-              },
-              "to": {
-                "$ref": "#/components/schemas/PayeeObject"
-              },
-              "token": {
-                "$ref": "#/components/schemas/TokenObject"
-              }
-            },
-            "required": ["from_account", "to", "token", "pay", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/PayObject"
           },
           {
-            "description": "If an observation is true, the first contract applies, otherwise the second contract applies.",
-            "properties": {
-              "else": {
-                "$ref": "#/components/schemas/ContractObject"
-              },
-              "if": {
-                "$ref": "#/components/schemas/ObservationObject"
-              },
-              "then": {
-                "$ref": "#/components/schemas/ContractObject"
-              }
-            },
-            "required": ["if", "then", "else"],
-            "type": "object"
+            "$ref": "#/components/schemas/IfObject"
           },
           {
-            "description": "Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.",
-            "properties": {
-              "timeout": {
-                "type": "integer"
-              },
-              "timeout_continuation": {
-                "$ref": "#/components/schemas/ContractObject"
-              },
-              "when": {
-                "items": {
-                  "$ref": "#/components/schemas/CaseObject"
-                },
-                "type": "array"
-              }
-            },
-            "required": ["when", "timeout", "timeout_continuation"],
-            "type": "object"
+            "$ref": "#/components/schemas/WhenObject"
           },
           {
-            "description": "Bind a value to a name within the scope of a sub-contract.",
-            "properties": {
-              "be": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "let": {
-                "type": "string"
-              },
-              "then": {
-                "$ref": "#/components/schemas/ContractObject"
-              }
-            },
-            "required": ["let", "be", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/LetObject"
           },
           {
-            "description": "Check an observation and produce a warning if it is false.",
-            "properties": {
-              "assert": {
-                "$ref": "#/components/schemas/ObservationObject"
-              },
-              "then": {
-                "$ref": "#/components/schemas/ContractObject"
-              }
-            },
-            "required": ["assert", "then"],
-            "type": "object"
+            "$ref": "#/components/schemas/AssertObject"
           },
           {
-            "properties": {
-              "ref": {
-                "$ref": "#/components/schemas/Label"
-              }
-            },
-            "required": ["ref"],
-            "type": "object"
+            "$ref": "#/components/schemas/LabelRef"
           }
         ]
       },
@@ -776,6 +791,146 @@
           }
         },
         "required": ["contractId", "tx"],
+        "type": "object"
+      },
+      "DepositAction": {
+        "properties": {
+          "deposits": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "into_account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "party": {
+            "$ref": "#/components/schemas/Party"
+          }
+        },
+        "required": ["party", "deposits", "of_token", "into_account"],
+        "type": "object"
+      },
+      "DepositActionObject": {
+        "properties": {
+          "deposits": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "into_account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "party": {
+            "$ref": "#/components/schemas/Party"
+          }
+        },
+        "required": ["party", "deposits", "of_token", "into_account"],
+        "type": "object"
+      },
+      "DepositContinuationInput": {
+        "description": "Deposit funds into an account in a contract and provide the continuation of the contract",
+        "properties": {
+          "continuation_hash": {
+            "type": "string"
+          },
+          "input_from_party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "into_account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "merkleized_continuation": {
+            "$ref": "#/components/schemas/Contract"
+          },
+          "of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "that_deposits": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "input_from_party",
+          "that_deposits",
+          "of_token",
+          "into_account",
+          "merkleized_continuation",
+          "continuation_hash"
+        ],
+        "type": "object"
+      },
+      "DepositInput": {
+        "description": "Deposit funds into an account in a contract",
+        "properties": {
+          "input_from_party": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "into_account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "that_deposits": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "input_from_party",
+          "that_deposits",
+          "of_token",
+          "into_account"
+        ],
+        "type": "object"
+      },
+      "Divide": {
+        "properties": {
+          "by": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "divide": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["divide", "by"],
+        "type": "object"
+      },
+      "DivideObject": {
+        "properties": {
+          "by": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "divide": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["divide", "by"],
+        "type": "object"
+      },
+      "Equal": {
+        "properties": {
+          "equal_to": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["value", "equal_to"],
+        "type": "object"
+      },
+      "EqualObject": {
+        "properties": {
+          "equal_to": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["value", "equal_to"],
         "type": "object"
       },
       "ExBudget": {
@@ -961,119 +1116,141 @@
         "required": ["results"],
         "type": "object"
       },
+      "Greater": {
+        "properties": {
+          "gt": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["value", "gt"],
+        "type": "object"
+      },
+      "GreaterObject": {
+        "properties": {
+          "gt": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["value", "gt"],
+        "type": "object"
+      },
+      "GreaterOrEqual": {
+        "properties": {
+          "ge_than": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["value", "ge_than"],
+        "type": "object"
+      },
+      "GreaterOrEqualObject": {
+        "properties": {
+          "ge_than": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["value", "ge_than"],
+        "type": "object"
+      },
+      "HexMetadata": {
+        "description": "Hex-encoded binary data of up to 64 bytes",
+        "pattern": "0x[A-Fa-f0-9]{0,128}",
+        "type": "string"
+      },
+      "If": {
+        "description": "If an observation is true, the first contract applies, otherwise the second contract applies.",
+        "properties": {
+          "else": {
+            "$ref": "#/components/schemas/Contract"
+          },
+          "if": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "then": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        },
+        "required": ["if", "then", "else"],
+        "type": "object"
+      },
+      "IfObject": {
+        "description": "If an observation is true, the first contract applies, otherwise the second contract applies.",
+        "properties": {
+          "else": {
+            "$ref": "#/components/schemas/ContractObject"
+          },
+          "if": {
+            "$ref": "#/components/schemas/ObservationObject"
+          },
+          "then": {
+            "$ref": "#/components/schemas/ContractObject"
+          }
+        },
+        "required": ["if", "then", "else"],
+        "type": "object"
+      },
+      "IfValue": {
+        "properties": {
+          "else": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "if": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "then": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["if", "then", "else"],
+        "type": "object"
+      },
+      "IfValueObject": {
+        "properties": {
+          "else": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "if": {
+            "$ref": "#/components/schemas/ObservationObject"
+          },
+          "then": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["if", "then", "else"],
+        "type": "object"
+      },
       "Input": {
         "description": "An input to a Marlowe transaction",
         "oneOf": [
           {
-            "description": "Notify a contract to check a condition and provide the continuation of the contract",
-            "properties": {
-              "continuation_hash": {
-                "type": "string"
-              },
-              "merkleized_continuation": {
-                "$ref": "#/components/schemas/Contract"
-              }
-            },
-            "required": ["merkleized_continuation", "continuation_hash"],
-            "type": "object"
+            "$ref": "#/components/schemas/ContinuationInput"
           },
           {
-            "description": "Notify a contract to check a condition",
-            "enum": ["input_notify"],
-            "type": "string"
+            "$ref": "#/components/schemas/NotifyInput"
           },
           {
-            "description": "Make a choice in a contract and provide the continuation of the contract",
-            "properties": {
-              "continuation_hash": {
-                "type": "string"
-              },
-              "for_choice_id": {
-                "$ref": "#/components/schemas/ChoiceId"
-              },
-              "input_that_chooses_num": {
-                "type": "integer"
-              },
-              "merkleized_continuation": {
-                "$ref": "#/components/schemas/Contract"
-              }
-            },
-            "required": [
-              "input_that_chooses_num",
-              "for_choice_id",
-              "merkleized_continuation",
-              "continuation_hash"
-            ],
-            "type": "object"
+            "$ref": "#/components/schemas/ChoiceContinuationInput"
           },
           {
-            "description": "Make a choice in a contract",
-            "properties": {
-              "for_choice_id": {
-                "$ref": "#/components/schemas/ChoiceId"
-              },
-              "input_that_chooses_num": {
-                "type": "integer"
-              }
-            },
-            "required": ["input_that_chooses_num", "for_choice_id"],
-            "type": "object"
+            "$ref": "#/components/schemas/ChoiceInput"
           },
           {
-            "description": "Deposit funds into an account in a contract and provide the continuation of the contract",
-            "properties": {
-              "continuation_hash": {
-                "type": "string"
-              },
-              "input_from_party": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "into_account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "merkleized_continuation": {
-                "$ref": "#/components/schemas/Contract"
-              },
-              "of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "that_deposits": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "input_from_party",
-              "that_deposits",
-              "of_token",
-              "into_account",
-              "merkleized_continuation",
-              "continuation_hash"
-            ],
-            "type": "object"
+            "$ref": "#/components/schemas/DepositInput"
           },
           {
-            "description": "Deposit funds into an account in a contract",
-            "properties": {
-              "input_from_party": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "into_account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "that_deposits": {
-                "type": "integer"
-              }
-            },
-            "required": [
-              "input_from_party",
-              "that_deposits",
-              "of_token",
-              "into_account"
-            ],
-            "type": "object"
+            "$ref": "#/components/schemas/DepositContinuationInput"
           }
         ]
       },
@@ -1081,47 +1258,53 @@
         "description": "A Marlowe transaction interval error.",
         "oneOf": [
           {
-            "description": "Invalid Marlowe transaction interval.",
-            "properties": {
-              "invalidInterval": {
-                "properties": {
-                  "from": {
-                    "type": "integer"
-                  },
-                  "to": {
-                    "type": "integer"
-                  }
-                },
-                "required": ["from", "to"],
-                "type": "object"
-              }
-            },
-            "required": ["invalidInterval"],
-            "type": "object"
+            "$ref": "#/components/schemas/InvalidInterval"
           },
           {
-            "description": "Marlowe transaction interval in past.",
-            "properties": {
-              "intervalInPastError": {
-                "properties": {
-                  "from": {
-                    "type": "integer"
-                  },
-                  "minTime": {
-                    "type": "integer"
-                  },
-                  "to": {
-                    "type": "integer"
-                  }
-                },
-                "required": ["minTime", "from", "to"],
-                "type": "object"
-              }
-            },
-            "required": ["intervalInPastError"],
-            "type": "object"
+            "$ref": "#/components/schemas/IntervalInPast"
           }
         ]
+      },
+      "IntervalInPast": {
+        "description": "Marlowe transaction interval in past.",
+        "properties": {
+          "intervalInPastError": {
+            "properties": {
+              "from": {
+                "type": "integer"
+              },
+              "minTime": {
+                "type": "integer"
+              },
+              "to": {
+                "type": "integer"
+              }
+            },
+            "required": ["minTime", "from", "to"],
+            "type": "object"
+          }
+        },
+        "required": ["intervalInPastError"],
+        "type": "object"
+      },
+      "InvalidInterval": {
+        "description": "Invalid Marlowe transaction interval.",
+        "properties": {
+          "invalidInterval": {
+            "properties": {
+              "from": {
+                "type": "integer"
+              },
+              "to": {
+                "type": "integer"
+              }
+            },
+            "required": ["from", "to"],
+            "type": "object"
+          }
+        },
+        "required": ["invalidInterval"],
+        "type": "object"
       },
       "IsMerkleizedContinuation": {
         "description": "Indicates if a given contract continuation is merkleized",
@@ -1174,41 +1357,120 @@
         "required": ["label", "type", "value"],
         "type": "object"
       },
+      "LabelRef": {
+        "properties": {
+          "ref": {
+            "$ref": "#/components/schemas/Label"
+          }
+        },
+        "required": ["ref"],
+        "type": "object"
+      },
+      "Lesser": {
+        "properties": {
+          "lt": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["value", "lt"],
+        "type": "object"
+      },
+      "LesserObject": {
+        "properties": {
+          "lt": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["value", "lt"],
+        "type": "object"
+      },
+      "LesserOrEqual": {
+        "properties": {
+          "le_than": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["value", "le_than"],
+        "type": "object"
+      },
+      "LesserOrEqualObject": {
+        "properties": {
+          "le_than": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["value", "le_than"],
+        "type": "object"
+      },
+      "Let": {
+        "description": "Bind a value to a name within the scope of a sub-contract.",
+        "properties": {
+          "be": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "let": {
+            "type": "string"
+          },
+          "then": {
+            "$ref": "#/components/schemas/Contract"
+          }
+        },
+        "required": ["let", "be", "then"],
+        "type": "object"
+      },
+      "LetObject": {
+        "description": "Bind a value to a name within the scope of a sub-contract.",
+        "properties": {
+          "be": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "let": {
+            "type": "string"
+          },
+          "then": {
+            "$ref": "#/components/schemas/ContractObject"
+          }
+        },
+        "required": ["let", "be", "then"],
+        "type": "object"
+      },
       "MarloweState": {
         "description": "The on-chain state of a Marlowe contract.",
         "properties": {
           "accounts": {
             "items": {
+              "maxItems": 2,
+              "minItems": 2,
               "items": {
                 "oneOf": [
                   {
-                    "items": {
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/Party"
-                        },
-                        {
-                          "$ref": "#/components/schemas/Token"
-                        }
-                      ]
-                    },
-                    "maxItems": 2,
-                    "minItems": 2,
-                    "type": "array"
+                    "$ref": "#/components/schemas/AccountTokenTuple"
                   },
                   {
                     "type": "integer"
                   }
                 ]
               },
-              "maxItems": 2,
-              "minItems": 2,
               "type": "array"
             },
             "type": "array"
           },
           "boundValues": {
             "items": {
+              "maxItems": 2,
+              "minItems": 2,
               "items": {
                 "oneOf": [
                   {
@@ -1219,8 +1481,6 @@
                   }
                 ]
               },
-              "maxItems": 2,
-              "minItems": 2,
               "type": "array"
             },
             "type": "array"
@@ -1244,6 +1504,7 @@
             "type": "array"
           },
           "minTime": {
+            "format": "int64",
             "type": "integer"
           }
         },
@@ -1256,7 +1517,129 @@
         "type": "string"
       },
       "Metadata": {
-        "description": "An arbitrary JSON value for storage in a metadata key"
+        "description": "Arbitrary JSON-encoded transaction metadata",
+        "oneOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "$ref": "#/components/schemas/HexMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/TextMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/MetadataArray"
+          },
+          {
+            "$ref": "#/components/schemas/AdditionalMetadata"
+          }
+        ]
+      },
+      "MetadataAndRecipients": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/TokenMetadata"
+          },
+          "recipients": {
+            "additionalProperties": {
+              "format": "int64",
+              "maximum": 1.8446744073709551615e19,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "object"
+          }
+        },
+        "required": ["recipients"],
+        "type": "object"
+      },
+      "MetadataAndScript": {
+        "properties": {
+          "metadata": {
+            "$ref": "#/components/schemas/TokenMetadata"
+          },
+          "script": {
+            "description": "The type of script receiving the role token.",
+            "enum": ["OpenRole"],
+            "type": "string"
+          }
+        },
+        "required": ["script"],
+        "type": "object"
+      },
+      "MetadataArray": {
+        "description": "Array of metadata values",
+        "items": {
+          "$ref": "#/components/schemas/Metadata"
+        },
+        "type": "array"
+      },
+      "Minus": {
+        "properties": {
+          "minus": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "value": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["value", "minus"],
+        "type": "object"
+      },
+      "MinusObject": {
+        "properties": {
+          "minus": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "value": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["value", "minus"],
+        "type": "object"
+      },
+      "Multiply": {
+        "properties": {
+          "multiply": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "times": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["multiply", "times"],
+        "type": "object"
+      },
+      "MultiplyObject": {
+        "properties": {
+          "multiply": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "times": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["multiply", "times"],
+        "type": "object"
+      },
+      "Negate": {
+        "properties": {
+          "negate": {
+            "$ref": "#/components/schemas/Value"
+          }
+        },
+        "required": ["negate"],
+        "type": "object"
+      },
+      "NegateObject": {
+        "properties": {
+          "negate": {
+            "$ref": "#/components/schemas/ValueObject"
+          }
+        },
+        "required": ["negate"],
+        "type": "object"
       },
       "Next": {
         "description": "Describe the reducibility (Can be Reduced ?) and the applicability (Can Inputs be Applied ?) for a given contract.",
@@ -1269,6 +1652,85 @@
           }
         },
         "required": ["can_reduce", "applicable_inputs"],
+        "type": "object"
+      },
+      "NonPositiveDeposit": {
+        "description": "A warning for a non-positive deposit.",
+        "properties": {
+          "asked_to_deposit": {
+            "type": "integer"
+          },
+          "in_account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "party": {
+            "$ref": "#/components/schemas/Party"
+          }
+        },
+        "required": ["party", "asked_to_deposit", "of_token", "in_account"],
+        "type": "object"
+      },
+      "NonPositivePayment": {
+        "description": "A warning for a non-positive payment.",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "asked_to_pay": {
+            "type": "integer"
+          },
+          "of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "to_payee": {
+            "$ref": "#/components/schemas/Payee"
+          }
+        },
+        "required": ["account", "asked_to_pay", "of_token", "to_payee"],
+        "type": "object"
+      },
+      "Not": {
+        "properties": {
+          "not": {
+            "$ref": "#/components/schemas/Observation"
+          }
+        },
+        "required": ["not"],
+        "type": "object"
+      },
+      "NotifyAction": {
+        "properties": {
+          "notify_if": {
+            "$ref": "#/components/schemas/Observation"
+          }
+        },
+        "required": ["notify_if"],
+        "type": "object"
+      },
+      "NotifyActionObject": {
+        "properties": {
+          "notify_if": {
+            "$ref": "#/components/schemas/Observation"
+          }
+        },
+        "required": ["notify_if"],
+        "type": "object"
+      },
+      "NotifyInput": {
+        "description": "Notify a contract to check a condition",
+        "enum": ["input_notify"],
+        "type": "string"
+      },
+      "NotObject": {
+        "properties": {
+          "not": {
+            "$ref": "#/components/schemas/ObservationObject"
+          }
+        },
+        "required": ["not"],
         "type": "object"
       },
       "ObjectBundle": {
@@ -1285,106 +1747,31 @@
             "type": "boolean"
           },
           {
-            "properties": {
-              "and": {
-                "$ref": "#/components/schemas/Observation"
-              },
-              "both": {
-                "$ref": "#/components/schemas/Observation"
-              }
-            },
-            "required": ["both", "and"],
-            "type": "object"
+            "$ref": "#/components/schemas/And"
           },
           {
-            "properties": {
-              "either": {
-                "$ref": "#/components/schemas/Observation"
-              },
-              "or": {
-                "$ref": "#/components/schemas/Observation"
-              }
-            },
-            "required": ["either", "or"],
-            "type": "object"
+            "$ref": "#/components/schemas/Or"
           },
           {
-            "properties": {
-              "not": {
-                "$ref": "#/components/schemas/Observation"
-              }
-            },
-            "required": ["not"],
-            "type": "object"
+            "$ref": "#/components/schemas/Not"
           },
           {
-            "properties": {
-              "chose_something_for": {
-                "$ref": "#/components/schemas/ChoiceId"
-              }
-            },
-            "required": ["chose_something_for"],
-            "type": "object"
+            "$ref": "#/components/schemas/ChooseFor"
           },
           {
-            "properties": {
-              "ge_than": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "value": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["value", "ge_than"],
-            "type": "object"
+            "$ref": "#/components/schemas/GreaterOrEqual"
           },
           {
-            "properties": {
-              "gt": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "value": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["value", "gt"],
-            "type": "object"
+            "$ref": "#/components/schemas/Greater"
           },
           {
-            "properties": {
-              "lt": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "value": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["value", "lt"],
-            "type": "object"
+            "$ref": "#/components/schemas/Lesser"
           },
           {
-            "properties": {
-              "le_than": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "value": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["value", "le_than"],
-            "type": "object"
+            "$ref": "#/components/schemas/LesserOrEqual"
           },
           {
-            "properties": {
-              "equal_to": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "value": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["value", "equal_to"],
-            "type": "object"
+            "$ref": "#/components/schemas/Equal"
           }
         ]
       },
@@ -1395,199 +1782,164 @@
             "type": "boolean"
           },
           {
-            "properties": {
-              "and": {
-                "$ref": "#/components/schemas/ObservationObject"
-              },
-              "both": {
-                "$ref": "#/components/schemas/ObservationObject"
-              }
-            },
-            "required": ["both", "and"],
-            "type": "object"
+            "$ref": "#/components/schemas/AndObject"
           },
           {
-            "properties": {
-              "either": {
-                "$ref": "#/components/schemas/ObservationObject"
-              },
-              "or": {
-                "$ref": "#/components/schemas/ObservationObject"
-              }
-            },
-            "required": ["either", "or"],
-            "type": "object"
+            "$ref": "#/components/schemas/OrObject"
           },
           {
-            "properties": {
-              "not": {
-                "$ref": "#/components/schemas/ObservationObject"
-              }
-            },
-            "required": ["not"],
-            "type": "object"
+            "$ref": "#/components/schemas/NotObject"
           },
           {
-            "properties": {
-              "chose_something_for": {
-                "$ref": "#/components/schemas/ChoiceIdObject"
-              }
-            },
-            "required": ["chose_something_for"],
-            "type": "object"
+            "$ref": "#/components/schemas/ChooseForObject"
           },
           {
-            "properties": {
-              "ge_than": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "value": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["value", "ge_than"],
-            "type": "object"
+            "$ref": "#/components/schemas/GreaterOrEqualObject"
           },
           {
-            "properties": {
-              "gt": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "value": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["value", "gt"],
-            "type": "object"
+            "$ref": "#/components/schemas/GreaterObject"
           },
           {
-            "properties": {
-              "lt": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "value": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["value", "lt"],
-            "type": "object"
+            "$ref": "#/components/schemas/LesserObject"
           },
           {
-            "properties": {
-              "le_than": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "value": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["value", "le_than"],
-            "type": "object"
+            "$ref": "#/components/schemas/LesserOrEqualObject"
           },
           {
-            "properties": {
-              "equal_to": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "value": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["value", "equal_to"],
-            "type": "object"
+            "$ref": "#/components/schemas/EqualObject"
           },
           {
-            "properties": {
-              "ref": {
-                "$ref": "#/components/schemas/Label"
-              }
-            },
-            "required": ["ref"],
-            "type": "object"
+            "$ref": "#/components/schemas/LabelRef"
           }
         ]
+      },
+      "Or": {
+        "properties": {
+          "either": {
+            "$ref": "#/components/schemas/Observation"
+          },
+          "or": {
+            "$ref": "#/components/schemas/Observation"
+          }
+        },
+        "required": ["either", "or"],
+        "type": "object"
+      },
+      "OrObject": {
+        "properties": {
+          "either": {
+            "$ref": "#/components/schemas/ObservationObject"
+          },
+          "or": {
+            "$ref": "#/components/schemas/ObservationObject"
+          }
+        },
+        "required": ["either", "or"],
+        "type": "object"
+      },
+      "PartialPayment": {
+        "description": "A warning for partial payment.",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "asked_to_pay": {
+            "type": "integer"
+          },
+          "but_only_paid": {
+            "type": "integer"
+          },
+          "of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "to_payee": {
+            "$ref": "#/components/schemas/Payee"
+          }
+        },
+        "required": [
+          "account",
+          "asked_to_pay",
+          "of_token",
+          "to_payee",
+          "but_only_paid"
+        ],
+        "type": "object"
       },
       "Party": {
         "description": "A participant in a contract",
         "oneOf": [
           {
-            "description": "Refers to a party by role name.",
-            "properties": {
-              "role_token": {
-                "type": "string"
-              }
-            },
-            "required": ["role_token"],
-            "type": "object"
+            "$ref": "#/components/schemas/PartyRoleName"
           },
           {
-            "description": "Refers to a party by Cardano address.",
-            "properties": {
-              "address": {
-                "$ref": "#/components/schemas/Address"
-              }
-            },
-            "required": ["address"],
-            "type": "object"
+            "$ref": "#/components/schemas/PartyAddress"
           }
         ]
+      },
+      "PartyAddress": {
+        "description": "Refers to a party by Cardano address.",
+        "properties": {
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          }
+        },
+        "required": ["address"],
+        "type": "object"
       },
       "PartyObject": {
         "description": "A participant in a contract",
         "oneOf": [
           {
-            "description": "Refers to a party by role name.",
-            "properties": {
-              "role_token": {
-                "type": "string"
-              }
-            },
-            "required": ["role_token"],
-            "type": "object"
+            "$ref": "#/components/schemas/PartyRoleName"
           },
           {
-            "description": "Refers to a party by Cardano address.",
-            "properties": {
-              "address": {
-                "$ref": "#/components/schemas/Address"
-              }
-            },
-            "required": ["address"],
-            "type": "object"
+            "$ref": "#/components/schemas/PartyAddress"
           },
           {
-            "properties": {
-              "ref": {
-                "$ref": "#/components/schemas/Label"
-              }
-            },
-            "required": ["ref"],
-            "type": "object"
+            "$ref": "#/components/schemas/LabelRef"
           }
         ]
+      },
+      "PartyRoleName": {
+        "description": "Refers to a party by role name.",
+        "properties": {
+          "role_token": {
+            "type": "string"
+          }
+        },
+        "required": ["role_token"],
+        "type": "object"
+      },
+      "Pay": {
+        "description": "A payment will be sent from an account to a payee.",
+        "properties": {
+          "from_account": {
+            "$ref": "#/components/schemas/Party"
+          },
+          "pay": {
+            "$ref": "#/components/schemas/Value"
+          },
+          "then": {
+            "$ref": "#/components/schemas/Contract"
+          },
+          "to": {
+            "$ref": "#/components/schemas/Payee"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Token"
+          }
+        },
+        "required": ["from_account", "to", "token", "pay", "then"],
+        "type": "object"
       },
       "Payee": {
         "description": "A recipient of a payment",
         "oneOf": [
           {
-            "description": "Pays funds into a party's account in the contract.",
-            "properties": {
-              "account": {
-                "$ref": "#/components/schemas/Party"
-              }
-            },
-            "required": ["account"],
-            "type": "object"
+            "$ref": "#/components/schemas/PayToAccount"
           },
           {
-            "description": "Pays funds to a party.",
-            "properties": {
-              "party": {
-                "$ref": "#/components/schemas/Party"
-              }
-            },
-            "required": ["party"],
-            "type": "object"
+            "$ref": "#/components/schemas/PayToParty"
           }
         ]
       },
@@ -1595,24 +1947,10 @@
         "description": "A recipient of a payment",
         "oneOf": [
           {
-            "description": "Pays funds into a party's account in the contract.",
-            "properties": {
-              "account": {
-                "$ref": "#/components/schemas/PartyObject"
-              }
-            },
-            "required": ["account"],
-            "type": "object"
+            "$ref": "#/components/schemas/PayToAccountObject"
           },
           {
-            "description": "Pays funds to a party.",
-            "properties": {
-              "party": {
-                "$ref": "#/components/schemas/PartyObject"
-              }
-            },
-            "required": ["party"],
-            "type": "object"
+            "$ref": "#/components/schemas/PayToPartyObject"
           }
         ]
       },
@@ -1633,6 +1971,28 @@
           }
         },
         "required": ["payment_from", "to", "token", "amount"]
+      },
+      "PayObject": {
+        "description": "A payment will be sent from an account to a payee.",
+        "properties": {
+          "from_account": {
+            "$ref": "#/components/schemas/PartyObject"
+          },
+          "pay": {
+            "$ref": "#/components/schemas/ValueObject"
+          },
+          "then": {
+            "$ref": "#/components/schemas/ContractObject"
+          },
+          "to": {
+            "$ref": "#/components/schemas/PayeeObject"
+          },
+          "token": {
+            "$ref": "#/components/schemas/TokenObject"
+          }
+        },
+        "required": ["from_account", "to", "token", "pay", "then"],
+        "type": "object"
       },
       "Payout": {
         "properties": {
@@ -1709,6 +2069,46 @@
         "enum": ["available", "withdrawn"],
         "type": "string"
       },
+      "PayToAccount": {
+        "description": "Pays funds into a party's account in the contract.",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/Party"
+          }
+        },
+        "required": ["account"],
+        "type": "object"
+      },
+      "PayToAccountObject": {
+        "description": "Pays funds into a party's account in the contract.",
+        "properties": {
+          "account": {
+            "$ref": "#/components/schemas/PartyObject"
+          }
+        },
+        "required": ["account"],
+        "type": "object"
+      },
+      "PayToParty": {
+        "description": "Pays funds to a party.",
+        "properties": {
+          "party": {
+            "$ref": "#/components/schemas/Party"
+          }
+        },
+        "required": ["party"],
+        "type": "object"
+      },
+      "PayToPartyObject": {
+        "description": "Pays funds to a party.",
+        "properties": {
+          "party": {
+            "$ref": "#/components/schemas/PartyObject"
+          }
+        },
+        "required": ["party"],
+        "type": "object"
+      },
       "Plutus.Address": {
         "description": "A Plutus address.",
         "properties": {
@@ -1725,24 +2125,10 @@
         "description": "A Plutus credential.",
         "oneOf": [
           {
-            "description": "A Plutus public key credential.",
-            "properties": {
-              "pubKeyCredential": {
-                "type": "string"
-              }
-            },
-            "required": ["pubKeyCredential"],
-            "type": "object"
+            "$ref": "#/components/schemas/PubKeyCredential"
           },
           {
-            "description": "A Plutus script credential.",
-            "properties": {
-              "scriptCredential": {
-                "type": "string"
-              }
-            },
-            "required": ["scriptCredential"],
-            "type": "object"
+            "$ref": "#/components/schemas/ScriptCredential"
           }
         ]
       },
@@ -1750,29 +2136,10 @@
         "description": "A Plutus staking credential.",
         "oneOf": [
           {
-            "description": "A Plutus staking hash.",
-            "properties": {
-              "stakingHash": {
-                "$ref": "#/components/schemas/Plutus.Credential"
-              }
-            },
-            "required": ["stakingHash"],
-            "type": "object"
+            "$ref": "#/components/schemas/StakingHash"
           },
           {
-            "description": "A Plutus staking pointer.",
-            "properties": {
-              "stakingHash": {
-                "items": {
-                  "type": "integer"
-                },
-                "maxItems": 3,
-                "minItems": 3,
-                "type": "array"
-              }
-            },
-            "required": ["stakingHash"],
-            "type": "object"
+            "$ref": "#/components/schemas/StakingPointer"
           }
         ]
       },
@@ -1816,7 +2183,7 @@
           },
           "minUTxODeposit": {
             "format": "int64",
-            "maximum": 18446744073709551615,
+            "maximum": 1.8446744073709551615e19,
             "minimum": 0,
             "type": "integer"
           },
@@ -1828,6 +2195,9 @@
               "$ref": "#/components/schemas/Metadata"
             },
             "type": "object"
+          },
+          "threadTokenName": {
+            "type": "string"
           },
           "version": {
             "$ref": "#/components/schemas/MarloweVersion"
@@ -1882,38 +2252,15 @@
         "required": ["payouts"],
         "type": "object"
       },
-      "RoleTokenConfig": {
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/Address"
-          },
-          {
-            "properties": {
-              "address": {
-                "$ref": "#/components/schemas/Address"
-              },
-              "metadata": {
-                "$ref": "#/components/schemas/TokenMetadata"
-              }
-            },
-            "required": ["address", "metadata"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "metadata": {
-                "$ref": "#/components/schemas/TokenMetadata"
-              },
-              "script": {
-                "description": "The type of script receiving the role token.",
-                "enum": ["ThreadRole", "OpenRole"],
-                "type": "string"
-              }
-            },
-            "required": ["script"],
-            "type": "object"
+      "PubKeyCredential": {
+        "description": "A Plutus public key credential.",
+        "properties": {
+          "pubKeyCredential": {
+            "type": "string"
           }
-        ]
+        },
+        "required": ["pubKeyCredential"],
+        "type": "object"
       },
       "RolesConfig": {
         "oneOf": [
@@ -1921,10 +2268,23 @@
             "$ref": "#/components/schemas/PolicyId"
           },
           {
-            "additionalProperties": {
-              "$ref": "#/components/schemas/RoleTokenConfig"
-            },
-            "type": "object"
+            "$ref": "#/components/schemas/AdditionalRolesConfigProp"
+          }
+        ]
+      },
+      "RoleTokenConfig": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Address"
+          },
+          {
+            "$ref": "#/components/schemas/AddressAndMetadata"
+          },
+          {
+            "$ref": "#/components/schemas/MetadataAndScript"
+          },
+          {
+            "$ref": "#/components/schemas/MetadataAndRecipients"
           }
         ]
       },
@@ -1987,6 +2347,44 @@
         },
         "required": ["error", "detail", "fatal"]
       },
+      "ScriptCredential": {
+        "description": "A Plutus script credential.",
+        "properties": {
+          "scriptCredential": {
+            "type": "string"
+          }
+        },
+        "required": ["scriptCredential"],
+        "type": "object"
+      },
+      "StakingHash": {
+        "description": "A Plutus staking hash.",
+        "properties": {
+          "stakingHash": {
+            "$ref": "#/components/schemas/Plutus.Credential"
+          }
+        },
+        "required": ["stakingHash"],
+        "type": "object"
+      },
+      "StakingHashTriple": {
+        "items": {
+          "type": "integer"
+        },
+        "maxItems": 3,
+        "minItems": 3,
+        "type": "array"
+      },
+      "StakingPointer": {
+        "description": "A Plutus staking pointer.",
+        "properties": {
+          "stakingHash": {
+            "$ref": "#/components/schemas/StakingHashTriple"
+          }
+        },
+        "required": ["stakingHash"],
+        "type": "object"
+      },
       "TextEnvelope": {
         "properties": {
           "cborHex": {
@@ -2003,6 +2401,14 @@
         "required": ["type", "description", "cborHex"],
         "type": "object"
       },
+      "TextMetadata": {
+        "description": "Text data of up to 64 characters",
+        "type": "string"
+      },
+      "TimeInterval": {
+        "enum": ["time_interval_start", "time_interval_end"],
+        "type": "string"
+      },
       "Token": {
         "description": "A token with a currency symbol (minting policy ID) and token name.",
         "properties": {
@@ -2016,7 +2422,38 @@
         "required": ["currency_symbol", "token_name"],
         "type": "object"
       },
+      "TokenAmount": {
+        "format": "int64",
+        "type": "integer"
+      },
+      "TokenInAccount": {
+        "properties": {
+          "amount_of_token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "in_account": {
+            "$ref": "#/components/schemas/Party"
+          }
+        },
+        "required": ["amount_of_token", "in_account"],
+        "type": "object"
+      },
+      "TokenInAccountObject": {
+        "properties": {
+          "amount_of_token": {
+            "$ref": "#/components/schemas/TokenObject"
+          },
+          "in_account": {
+            "$ref": "#/components/schemas/PartyObject"
+          }
+        },
+        "required": ["amount_of_token", "in_account"],
+        "type": "object"
+      },
       "TokenMetadata": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Metadata"
+        },
         "description": "Metadata for an NFT, as described by https://cips.cardano.org/cips/cip25/",
         "properties": {
           "description": {
@@ -2042,6 +2479,9 @@
         "type": "object"
       },
       "TokenMetadataFile": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Metadata"
+        },
         "properties": {
           "mediaType": {
             "type": "string"
@@ -2063,13 +2503,7 @@
             "$ref": "#/components/schemas/Token"
           },
           {
-            "properties": {
-              "ref": {
-                "$ref": "#/components/schemas/Label"
-              }
-            },
-            "required": ["ref"],
-            "type": "object"
+            "$ref": "#/components/schemas/LabelRef"
           }
         ]
       },
@@ -2153,45 +2587,17 @@
             "type": "object"
           }
         },
-        "required": ["tx_interval", "tx_inputs"]
+        "required": ["tx_interval", "tx_inputs"],
+        "type": "object"
       },
       "TransactionOutput": {
         "description": "Marlowe transaction output.",
         "oneOf": [
           {
-            "description": "Marlowe transaction output information.",
-            "properties": {
-              "contract": {
-                "$ref": "#/components/schemas/Contract"
-              },
-              "payments": {
-                "items": {
-                  "$ref": "#/components/schemas/Payment"
-                },
-                "type": "array"
-              },
-              "state": {
-                "$ref": "#/components/schemas/MarloweState"
-              },
-              "warnings": {
-                "items": {
-                  "$ref": "#/components/schemas/TransactionWarning"
-                },
-                "type": "array"
-              }
-            },
-            "required": ["warnings", "payments", "state", "contract"],
-            "type": "object"
+            "$ref": "#/components/schemas/TxOutputSuccess"
           },
           {
-            "description": "Marlowe transaction error.",
-            "properties": {
-              "transaction_error": {
-                "$ref": "#/components/schemas/TransactionError"
-              }
-            },
-            "required": ["transaction_error"],
-            "type": "object"
+            "$ref": "#/components/schemas/TxOutputError"
           }
         ]
       },
@@ -2199,91 +2605,19 @@
         "description": "A transaction semantics warning.",
         "oneOf": [
           {
-            "description": "A warning for a non-positive deposit.",
-            "properties": {
-              "asked_to_deposit": {
-                "type": "integer"
-              },
-              "in_account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "party": {
-                "$ref": "#/components/schemas/Party"
-              }
-            },
-            "required": ["party", "asked_to_deposit", "of_token", "in_account"],
-            "type": "object"
+            "$ref": "#/components/schemas/NonPositiveDeposit"
           },
           {
-            "description": "A warning for a non-positive payment.",
-            "properties": {
-              "account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "asked_to_pay": {
-                "type": "integer"
-              },
-              "of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "to_payee": {
-                "$ref": "#/components/schemas/Payee"
-              }
-            },
-            "required": ["account", "asked_to_pay", "of_token", "to_payee"],
-            "type": "object"
+            "$ref": "#/components/schemas/NonPositivePayment"
           },
           {
-            "description": "A warning for partial payment.",
-            "properties": {
-              "account": {
-                "$ref": "#/components/schemas/Party"
-              },
-              "asked_to_pay": {
-                "type": "integer"
-              },
-              "but_only_paid": {
-                "type": "integer"
-              },
-              "of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "to_payee": {
-                "$ref": "#/components/schemas/Payee"
-              }
-            },
-            "required": [
-              "account",
-              "asked_to_pay",
-              "of_token",
-              "to_payee",
-              "but_only_paid"
-            ],
-            "type": "object"
+            "$ref": "#/components/schemas/PartialPayment"
           },
           {
-            "description": "A variable-name shadowing warning.",
-            "properties": {
-              "had_value": {
-                "type": "integer"
-              },
-              "is_now_assigned": {
-                "type": "integer"
-              },
-              "value_id": {
-                "type": "string"
-              }
-            },
-            "required": ["value_id", "had_value", "is_now_assigned"],
-            "type": "object"
+            "$ref": "#/components/schemas/VariableShadowing"
           },
           {
-            "description": "A semantics assertion failed.",
-            "enum": ["assertion_failed"],
-            "type": "string"
+            "$ref": "#/components/schemas/AssertFail"
           }
         ]
       },
@@ -2304,14 +2638,14 @@
           "contractId": {
             "$ref": "#/components/schemas/TxOutRef"
           },
-          "inputUtxo": {
-            "$ref": "#/components/schemas/TxOutRef"
-          },
           "inputs": {
             "items": {
               "$ref": "#/components/schemas/Input"
             },
             "type": "array"
+          },
+          "inputUtxo": {
+            "$ref": "#/components/schemas/TxOutRef"
           },
           "invalidBefore": {
             "$ref": "#/components/schemas/UTCTime"
@@ -2418,6 +2752,41 @@
         "pattern": "^[a-fA-F0-9]{64}$",
         "type": "string"
       },
+      "TxOutputError": {
+        "description": "Marlowe transaction error.",
+        "properties": {
+          "transaction_error": {
+            "$ref": "#/components/schemas/TransactionError"
+          }
+        },
+        "required": ["transaction_error"],
+        "type": "object"
+      },
+      "TxOutputSuccess": {
+        "description": "Marlowe transaction output information.",
+        "properties": {
+          "contract": {
+            "$ref": "#/components/schemas/Contract"
+          },
+          "payments": {
+            "items": {
+              "$ref": "#/components/schemas/Payment"
+            },
+            "type": "array"
+          },
+          "state": {
+            "$ref": "#/components/schemas/MarloweState"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/TransactionWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["warnings", "payments", "state", "contract"],
+        "type": "object"
+      },
       "TxOutRef": {
         "description": "A reference to a transaction output with a transaction ID and index.",
         "example": "98d601c9307dd43307cf68a03aad0086d4e07a789b66919ccf9f7f7676577eb7#1",
@@ -2429,6 +2798,15 @@
         "enum": ["unsigned", "submitted", "confirmed"],
         "type": "string"
       },
+      "UseValue": {
+        "properties": {
+          "use_value": {
+            "type": "string"
+          }
+        },
+        "required": ["use_value"],
+        "type": "object"
+      },
       "UTCTime": {
         "example": "2016-07-22T00:00:00Z",
         "format": "yyyy-mm-ddThh:MM:ssZ",
@@ -2438,114 +2816,37 @@
         "description": "A time-varying expression that evaluates to a boolean",
         "oneOf": [
           {
-            "properties": {
-              "amount_of_token": {
-                "$ref": "#/components/schemas/Token"
-              },
-              "in_account": {
-                "$ref": "#/components/schemas/Party"
-              }
-            },
-            "required": ["amount_of_token", "in_account"],
-            "type": "object"
+            "$ref": "#/components/schemas/TokenInAccount"
           },
           {
-            "format": "int64",
-            "type": "integer"
+            "$ref": "#/components/schemas/TokenAmount"
           },
           {
-            "properties": {
-              "negate": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["negate"],
-            "type": "object"
+            "$ref": "#/components/schemas/Negate"
           },
           {
-            "properties": {
-              "add": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "and": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["add", "and"],
-            "type": "object"
+            "$ref": "#/components/schemas/Add"
           },
           {
-            "properties": {
-              "minus": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "value": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["value", "minus"],
-            "type": "object"
+            "$ref": "#/components/schemas/Minus"
           },
           {
-            "properties": {
-              "multiply": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "times": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["multiply", "times"],
-            "type": "object"
+            "$ref": "#/components/schemas/Multiply"
           },
           {
-            "properties": {
-              "by": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "divide": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["divide", "by"],
-            "type": "object"
+            "$ref": "#/components/schemas/Divide"
           },
           {
-            "properties": {
-              "value_of_choice": {
-                "$ref": "#/components/schemas/ChoiceId"
-              }
-            },
-            "required": ["value_of_choice"],
-            "type": "object"
+            "$ref": "#/components/schemas/ValueOfChoice"
           },
           {
-            "enum": ["time_interval_start", "time_interval_end"],
-            "type": "string"
+            "$ref": "#/components/schemas/TimeInterval"
           },
           {
-            "properties": {
-              "use_value": {
-                "type": "string"
-              }
-            },
-            "required": ["use_value"],
-            "type": "object"
+            "$ref": "#/components/schemas/UseValue"
           },
           {
-            "properties": {
-              "else": {
-                "$ref": "#/components/schemas/Value"
-              },
-              "if": {
-                "$ref": "#/components/schemas/Observation"
-              },
-              "then": {
-                "$ref": "#/components/schemas/Value"
-              }
-            },
-            "required": ["if", "then", "else"],
-            "type": "object"
+            "$ref": "#/components/schemas/IfValue"
           }
         ]
       },
@@ -2553,125 +2854,153 @@
         "description": "A time-varying expression that evaluates to a boolean",
         "oneOf": [
           {
-            "properties": {
-              "amount_of_token": {
-                "$ref": "#/components/schemas/TokenObject"
-              },
-              "in_account": {
-                "$ref": "#/components/schemas/PartyObject"
-              }
-            },
-            "required": ["amount_of_token", "in_account"],
-            "type": "object"
+            "$ref": "#/components/schemas/TokenInAccountObject"
           },
           {
+            "$ref": "#/components/schemas/TokenAmount"
+          },
+          {
+            "$ref": "#/components/schemas/NegateObject"
+          },
+          {
+            "$ref": "#/components/schemas/AddObject"
+          },
+          {
+            "$ref": "#/components/schemas/MinusObject"
+          },
+          {
+            "$ref": "#/components/schemas/MultiplyObject"
+          },
+          {
+            "$ref": "#/components/schemas/DivideObject"
+          },
+          {
+            "$ref": "#/components/schemas/ValueOfChoiceObject"
+          },
+          {
+            "$ref": "#/components/schemas/TimeInterval"
+          },
+          {
+            "$ref": "#/components/schemas/UseValue"
+          },
+          {
+            "$ref": "#/components/schemas/IfValueObject"
+          },
+          {
+            "$ref": "#/components/schemas/LabelRef"
+          }
+        ]
+      },
+      "ValueOfChoice": {
+        "properties": {
+          "value_of_choice": {
+            "$ref": "#/components/schemas/ChoiceId"
+          }
+        },
+        "required": ["value_of_choice"],
+        "type": "object"
+      },
+      "ValueOfChoiceObject": {
+        "properties": {
+          "value_of_choice": {
+            "$ref": "#/components/schemas/ChoiceIdObject"
+          }
+        },
+        "required": ["value_of_choice"],
+        "type": "object"
+      },
+      "VariableShadowing": {
+        "description": "A variable-name shadowing warning.",
+        "properties": {
+          "had_value": {
+            "type": "integer"
+          },
+          "is_now_assigned": {
+            "type": "integer"
+          },
+          "value_id": {
+            "type": "string"
+          }
+        },
+        "required": ["value_id", "had_value", "is_now_assigned"],
+        "type": "object"
+      },
+      "When": {
+        "description": "Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.",
+        "properties": {
+          "timeout": {
             "format": "int64",
             "type": "integer"
           },
-          {
-            "properties": {
-              "negate": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["negate"],
-            "type": "object"
+          "timeout_continuation": {
+            "$ref": "#/components/schemas/Contract"
           },
-          {
-            "properties": {
-              "add": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "and": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
+          "when": {
+            "items": {
+              "$ref": "#/components/schemas/Case"
             },
-            "required": ["add", "and"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "minus": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "value": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["value", "minus"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "multiply": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "times": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["multiply", "times"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "by": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "divide": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["divide", "by"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "value_of_choice": {
-                "$ref": "#/components/schemas/ChoiceIdObject"
-              }
-            },
-            "required": ["value_of_choice"],
-            "type": "object"
-          },
-          {
-            "enum": ["time_interval_start", "time_interval_end"],
-            "type": "string"
-          },
-          {
-            "properties": {
-              "use_value": {
-                "type": "string"
-              }
-            },
-            "required": ["use_value"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "else": {
-                "$ref": "#/components/schemas/ValueObject"
-              },
-              "if": {
-                "$ref": "#/components/schemas/ObservationObject"
-              },
-              "then": {
-                "$ref": "#/components/schemas/ValueObject"
-              }
-            },
-            "required": ["if", "then", "else"],
-            "type": "object"
-          },
-          {
-            "properties": {
-              "ref": {
-                "$ref": "#/components/schemas/Label"
-              }
-            },
-            "required": ["ref"],
-            "type": "object"
+            "type": "array"
           }
-        ]
+        },
+        "required": ["when", "timeout", "timeout_continuation"],
+        "type": "object"
+      },
+      "WhenObject": {
+        "description": "Wait for an action to be performed and apply the matching contract when it does. Apply the timeout contract if no actions have been performed in the timeout period.",
+        "properties": {
+          "timeout": {
+            "format": "int64",
+            "type": "integer"
+          },
+          "timeout_continuation": {
+            "$ref": "#/components/schemas/ContractObject"
+          },
+          "when": {
+            "items": {
+              "$ref": "#/components/schemas/CaseObject"
+            },
+            "type": "array"
+          }
+        },
+        "required": ["when", "timeout", "timeout_continuation"],
+        "type": "object"
+      },
+      "Withdrawal": {
+        "properties": {
+          "block": {
+            "$ref": "#/components/schemas/BlockHeader"
+          },
+          "payouts": {
+            "items": {
+              "$ref": "#/components/schemas/PayoutHeader"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/TxStatus"
+          },
+          "withdrawalId": {
+            "$ref": "#/components/schemas/TxId"
+          }
+        },
+        "required": ["payouts", "withdrawalId", "status"],
+        "type": "object"
+      },
+      "WithdrawalHeader": {
+        "properties": {
+          "block": {
+            "$ref": "#/components/schemas/BlockHeader"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TxStatus"
+          },
+          "withdrawalId": {
+            "$ref": "#/components/schemas/TxId"
+          }
+        },
+        "required": ["withdrawalId", "status"],
+        "type": "object"
       },
       "WithdrawPayoutsResponse": {
         "properties": {
@@ -2714,43 +3043,6 @@
           }
         },
         "required": ["withdrawalId", "tx"],
-        "type": "object"
-      },
-      "Withdrawal": {
-        "properties": {
-          "block": {
-            "$ref": "#/components/schemas/BlockHeader"
-          },
-          "payouts": {
-            "items": {
-              "$ref": "#/components/schemas/PayoutHeader"
-            },
-            "type": "array",
-            "uniqueItems": true
-          },
-          "status": {
-            "$ref": "#/components/schemas/TxStatus"
-          },
-          "withdrawalId": {
-            "$ref": "#/components/schemas/TxId"
-          }
-        },
-        "required": ["payouts", "withdrawalId", "status"],
-        "type": "object"
-      },
-      "WithdrawalHeader": {
-        "properties": {
-          "block": {
-            "$ref": "#/components/schemas/BlockHeader"
-          },
-          "status": {
-            "$ref": "#/components/schemas/TxStatus"
-          },
-          "withdrawalId": {
-            "$ref": "#/components/schemas/TxId"
-          }
-        },
-        "required": ["withdrawalId", "status"],
         "type": "object"
       }
     }
