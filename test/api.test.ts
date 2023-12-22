@@ -10,6 +10,75 @@ describe("Parse api info", () => {
     expect(contractsRes.data.results.length).toBeGreaterThan(0);
   });
 
+  it("createContract tx field should not be empty", async () => {
+    const createRes = await api.createContract({
+      postContractsRequest: {
+        contract: {
+          when: [
+            {
+              case: {
+                party: { role_token: "provider" },
+                deposits: 3000000,
+                of_token: { currency_symbol: "", token_name: "" },
+                into_account: { role_token: "provider" },
+              },
+              then: {
+                when: [
+                  {
+                    case: {
+                      party: { role_token: "swapper" },
+                      deposits: 3000000,
+                      of_token: { currency_symbol: "", token_name: "" },
+                      into_account: { role_token: "swapper" },
+                    },
+                    then: {
+                      pay: 3000000,
+                      token: { currency_symbol: "", token_name: "" },
+                      from_account: { role_token: "provider" },
+                      to: { party: { role_token: "swapper" } },
+                      then: {
+                        pay: 3000000,
+                        token: { currency_symbol: "", token_name: "" },
+                        from_account: { role_token: "swapper" },
+                        to: { party: { role_token: "provider" } },
+                        then: "close",
+                      },
+                    },
+                  },
+                ],
+                timeout: 1704288420000,
+                timeout_continuation: {
+                  pay: 3000000,
+                  token: { currency_symbol: "", token_name: "" },
+                  from_account: { role_token: "provider" },
+                  to: { party: { role_token: "provider" } },
+                  then: "close",
+                },
+              },
+            },
+          ],
+          timeout: 1704288420000,
+          timeout_continuation: "close",
+        },
+        version: "v1",
+        roles: {
+          provider:
+            "addr_test1vzuqvqzcnuy9pmrh2sy7tjucufmpwh8gzssz7v6scn0e04gxdvna9",
+          swapper:
+            "addr_test1vzuqvqzcnuy9pmrh2sy7tjucufmpwh8gzssz7v6scn0e04gxdvna9",
+        },
+        tags: {
+          sometag: { tag1: "", tag2: "null" },
+        },
+        metadata: {},
+        minUTxODeposit: 3000000,
+      },
+      xChangeAddress:
+        "addr_test1vzuqvqzcnuy9pmrh2sy7tjucufmpwh8gzssz7v6scn0e04gxdvna9",
+    });
+    expect(createRes.data.resource.tx.cborHex.length).toBeGreaterThan(0);
+  });
+
   it("getContractSourceById response should match expected output", async () => {
     const sourceRes = await api.getContractSourceById({
       contractSourceId:
