@@ -8,5 +8,5 @@
     "lib": ["es6", "dom"],
     "typeRoots": ["node_modules/@types"]
   },
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "test"]
 }
