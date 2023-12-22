@@ -13,53 +13,7 @@ describe("Parse api info", () => {
   it("createContract tx field should not be empty", async () => {
     const createRes = await api.createContract({
       postContractsRequest: {
-        contract: {
-          when: [
-            {
-              case: {
-                party: { role_token: "provider" },
-                deposits: 3000000,
-                of_token: { currency_symbol: "", token_name: "" },
-                into_account: { role_token: "provider" },
-              },
-              then: {
-                when: [
-                  {
-                    case: {
-                      party: { role_token: "swapper" },
-                      deposits: 3000000,
-                      of_token: { currency_symbol: "", token_name: "" },
-                      into_account: { role_token: "swapper" },
-                    },
-                    then: {
-                      pay: 3000000,
-                      token: { currency_symbol: "", token_name: "" },
-                      from_account: { role_token: "provider" },
-                      to: { party: { role_token: "swapper" } },
-                      then: {
-                        pay: 3000000,
-                        token: { currency_symbol: "", token_name: "" },
-                        from_account: { role_token: "swapper" },
-                        to: { party: { role_token: "provider" } },
-                        then: "close",
-                      },
-                    },
-                  },
-                ],
-                timeout: 1704288420000,
-                timeout_continuation: {
-                  pay: 3000000,
-                  token: { currency_symbol: "", token_name: "" },
-                  from_account: { role_token: "provider" },
-                  to: { party: { role_token: "provider" } },
-                  then: "close",
-                },
-              },
-            },
-          ],
-          timeout: 1704288420000,
-          timeout_continuation: "close",
-        },
+        contract: swapContract,
         version: "v1",
         roles: {
           provider:
