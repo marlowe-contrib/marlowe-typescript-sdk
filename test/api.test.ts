@@ -1,5 +1,5 @@
 import { Configuration, DefaultApi } from "marlowe-typescript-generated";
-import { swapContract, tx } from "./assets";
+import { swapContract, swapContractResponse, tx } from "./assets";
 const configuration = new Configuration({
   basePath: "https://marlowe-runtime-preprod-web.scdev.aws.iohkdev.io",
 });
@@ -31,6 +31,18 @@ describe("Parse api info", () => {
         "addr_test1vzuqvqzcnuy9pmrh2sy7tjucufmpwh8gzssz7v6scn0e04gxdvna9",
     });
     expect(createRes.data.resource.tx.cborHex.length).toBeGreaterThan(0);
+  });
+
+  it("createContractSources tx field should not be empty", async () => {
+    const uploadRes = await api.createContractSources({
+      main: "contract1",
+      labelledObject: [
+        { label: "contract1", type: "contract", value: swapContract },
+        { label: "contract2", type: "contract", value: swapContract },
+      ],
+    });
+    expect(uploadRes.data.contractSourceId.length).toBeGreaterThan(0);
+    expect(Object.keys(uploadRes.data.intermediateIds).length).toBe(2);
   });
 
   it("getContractSourceById response should match expected output", async () => {
@@ -83,7 +95,7 @@ describe("Parse api info", () => {
       contractId:
         "14a950e998711bb16c72fdd0bd707b4a306daf38bc1fc2e560aae3409dd30c25#1",
     });
-    expect(contractRes.data.resource).toEqual(swapContract);
+    expect(contractRes.data.resource).toEqual(swapContractResponse);
   });
 
   it("getNextStepsForContract returns expected next steps", async () => {
