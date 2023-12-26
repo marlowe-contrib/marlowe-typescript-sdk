@@ -2,3 +2,4 @@ openapitools.json
 node_modules
 dist
 .openapi-generator
+test_suite_analysis
