@@ -1,6 +1,6 @@
 {
   "name": "marlowe-typescript-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Typescript SDK for the Marlowe Runtime REST API",
   "main": "index.ts",
   "scripts": {
